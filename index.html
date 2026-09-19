@@ -67,10 +67,11 @@ button{touch-action:manipulation;user-select:none;-webkit-user-select:none;font-
 }
 
 .bottom-bar{flex:0 0 auto;display:flex;gap:6px;align-items:center;padding:6px 10px;padding-bottom:calc(6px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid var(--line);z-index:100}
-.bb-btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:0 12px;height:42px;min-width:48px;font-size:16px;font-weight:700;cursor:pointer;color:#333;display:inline-flex;align-items:center;justify-content:center;gap:6px;flex-shrink:0}
+.bb-btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:0 12px;height:44px;min-width:50px;font-size:16px;font-weight:700;cursor:pointer;color:#333;display:inline-flex;align-items:center;justify-content:center;gap:6px;flex-shrink:0}
 .bb-btn:active{background:#f1f3f5}
 .bb-btn:disabled{opacity:.35}
 .bb-btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+.bb-btn.add{background:var(--accent);color:#fff;border-color:var(--accent);font-size:22px;font-weight:800}
 .bb-btn.danger{background:#fff;color:#C00000;border-color:#e8b5b5}
 .bb-btn .ico{font-size:18px;line-height:1}
 .bb-info{font-size:13px;color:#666;padding:0 10px;font-weight:600;margin-left:auto;white-space:nowrap}
@@ -96,13 +97,14 @@ label.check{display:flex;align-items:center;gap:8px;font-size:14px;min-height:34
 input[type=text]{padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:14px;width:100%;background:#fff}
 input[type=checkbox]{width:22px;height:22px;accent-color:var(--brand)}
 .hidden{display:none!important}
-.thumbs{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;max-height:120px;overflow-y:auto}
+.thumbs{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;max-height:200px;overflow-y:auto}
 .thumb-btn{padding:7px 11px;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer;font-weight:600;font-size:13px;min-width:38px;min-height:36px}
 .thumb-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 .pen-indicator{display:inline-flex;align-items:center;gap:6px;padding:0 10px;height:40px;border-radius:20px;background:#f1f3f5;font-size:12px;font-weight:600;color:#666;flex-shrink:0}
 .pen-indicator.active{background:#4EA72E;color:#fff}
 .pen-dot{width:8px;height:8px;border-radius:50%;background:currentColor}
 .mode-indicator{padding:0 12px;height:40px;border-radius:8px;background:#FFF3CD;color:#856404;font-weight:600;font-size:12px;flex-shrink:0;border:1px solid #FFE69C;display:inline-flex;align-items:center}
+.hint{background:#EAF2FB;border:1px solid #b8d4f0;border-radius:8px;padding:10px;font-size:13px;color:#1a4a7a;margin-bottom:12px}
 
 #mini-error-console{position:fixed;right:8px;bottom:80px;max-width:min(42ch,80vw);max-height:30vh;overflow:auto;font:11px/1.35 ui-monospace,Menlo,monospace;background:#111;color:#f66;padding:8px 10px;border-radius:10px;z-index:999999;white-space:pre-wrap;pointer-events:none;opacity:0;transition:opacity .3s;box-shadow:0 6px 18px rgba(0,0,0,.35)}
 #mini-error-console.show{opacity:1}
@@ -135,6 +137,7 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--brand)}
 </div>
 
 <div class="bottom-bar">
+  <button id="bb-add" class="bb-btn add" title="Foto's toevoegen">＋</button>
   <button id="bb-prev" class="bb-btn" title="Vorige foto"><span class="ico">←</span></button>
   <button id="bb-next" class="bb-btn" title="Volgende foto"><span class="ico">→</span></button>
   <button id="bb-export" class="bb-btn primary" title="Download huidige foto"><span class="ico">📥</span></button>
@@ -145,10 +148,7 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--brand)}
 <aside id="panel-left" class="panel panel-left">
   <div class="panel-head"><span>Foto's</span><button class="close-x" data-close="left">✕</button></div>
   <div class="content">
-    <div class="row">
-      <button id="btn-load" class="btn">Bestanden kiezen…</button>
-      <input id="file-input" class="hidden" type="file" accept="image/*" multiple>
-    </div>
+    <div class="hint">Tik op <b>＋</b> onderaan om foto's toe te voegen.</div>
     <div class="row">
       <button id="btn-prev" class="btn">← Vorige</button>
       <button id="btn-next" class="btn">Volgende →</button>
@@ -207,6 +207,7 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--brand)}
 </aside>
 
 <div id="backdrop"></div>
+<input id="file-input" class="hidden" type="file" accept="image/*" multiple>
 <div id="mini-error-console" aria-live="polite">OK</div>
 
 <script src="https://unpkg.com/konva@9/konva.min.js"></script>
@@ -219,14 +220,6 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--brand)}
 
 if(typeof Konva !== 'undefined'){
   if(typeof Konva.pixelRatio !== 'undefined') Konva.pixelRatio = 1;
-  if(!Array.prototype.toArray){
-    try{
-      Object.defineProperty(Array.prototype, 'toArray', {
-        value: function(){ return this.slice ? this.slice() : Array.from(this); },
-        writable:false, configurable:true, enumerable:false
-      });
-    }catch(e){}
-  }
 }
 
 function toArr(x){
@@ -289,7 +282,7 @@ let pendingSymbol = null;
 let selectedNode = null;
 let currentShape = null;
 let isDirty = false;
-const EMPTY_JSON = '{"className":"Layer","attrs":{},"children":[]}';
+const EMPTY_JSON = '[]';
 function setDirty(){ isDirty = true; }
 
 let STAGE_W = 800, STAGE_H = 600;
@@ -345,6 +338,8 @@ function commitDragEnd(){
   commitHistory(); saveScene(); isDirty = false;
 }
 function enableSelect(node){
+  if(node.__selectEnabled) return;
+  node.__selectEnabled = true;
   node.on('pointerdown', () => { if(currentTool === 'select') selectNode(node); });
   node.on('dragmove transform', setDirty);
   node.on('dragend', commitDragEnd);
@@ -574,7 +569,7 @@ setTool('select');
       currentLineType = key;
       document.querySelectorAll('.ltype-btn').forEach(x => x.classList.remove('active'));
       b.classList.add('active');
-      setTool('line');   // automatisch naar Lijn
+      setTool('line');
     });
     row.appendChild(b);
   });
@@ -636,22 +631,24 @@ function placeSymbol(key, x, y){
 }
 
 const fileInput = document.getElementById('file-input');
-const btnLoad = document.getElementById('btn-load');
-const btnPrev = document.getElementById('btn-prev');
-const btnNext = document.getElementById('btn-next');
 const thumbsEl = document.getElementById('thumbs');
 const curName = document.getElementById('current-name');
 
-btnLoad.addEventListener('click', () => fileInput.click());
+/* ============ Foto's toevoegen ============ */
+document.getElementById('bb-add').addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', async e => {
   const files = [...(e.target.files||[])];
   await handleFiles(files);
   e.target.value = '';
 });
+
 function newId(){ return 'img-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,8); }
 
 async function handleFiles(files){
   if(!files || !files.length) return;
+  // Sorteer op bestandsnaam numeriek (1, 2, 3, ..., 10, 11)
+  files.sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { numeric: true, sensitivity: 'base' }));
+
   const items = await Promise.all(files.map(f => new Promise(res => {
     const fr = new FileReader();
     fr.onload = () => {
@@ -665,6 +662,7 @@ async function handleFiles(files){
   })));
   const good = items.filter(Boolean);
   if(!good.length) return;
+
   const had = imageFiles.length > 0;
   if(!had){
     if(layerChildrenNoTransformer().length) clearLayer();
@@ -674,7 +672,11 @@ async function handleFiles(files){
   } else {
     selectNode(null); flushAndSave();
     imageFiles = imageFiles.concat(good);
+    // her-sorteer de hele lijst op naam
+    imageFiles.sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { numeric: true, sensitivity: 'base' }));
     good.forEach(it => { scenes[it.id] = EMPTY_JSON; history[it.id] = { past:[EMPTY_JSON], future:[] }; });
+    currentIndex = imageFiles.findIndex(f => f.id === currentId);
+    if(currentIndex < 0) currentIndex = 0;
   }
   renderThumbs();
   loadImageAt(currentIndex);
@@ -761,8 +763,8 @@ function switchImage(d){
   currentId = imageFiles[currentIndex].id;
   loadImageAt(currentIndex);
 }
-btnPrev.addEventListener('click', () => switchImage(-1));
-btnNext.addEventListener('click', () => switchImage(1));
+document.getElementById('btn-prev').addEventListener('click', () => switchImage(-1));
+document.getElementById('btn-next').addEventListener('click', () => switchImage(1));
 
 document.getElementById('btn-remove-photo').addEventListener('click', () => {
   if(currentIndex < 0) return;
@@ -811,28 +813,40 @@ document.getElementById('bb-delete').addEventListener('click', () => {
   document.getElementById('btn-remove-photo').click();
 });
 
+/* ============ Snapshot = array van node-JSONs (robuuster) ============ */
 let lastCommitJson = '';
 let lastCommitTime = 0;
 
 function snapshot(){
-  const layer = transformer.getLayer();
-  transformer.remove();
-  const json = drawLayer.toJSON();
-  layer.add(transformer); transformer.moveToTop();
-  return json;
+  const children = layerChildrenNoTransformer();
+  const arr = [];
+  for(let i = 0; i < children.length; i++){
+    try{ arr.push(children[i].toJSON()); }catch(e){ /* skip kapotte node */ }
+  }
+  return JSON.stringify(arr);
 }
-function applyJSON(json){
+
+function applyJSON(jsonStr){
   clearLayer();
-  if(json){
+  if(jsonStr){
     try{
-      const temp = Konva.Node.create(json);
-      const children = toArr(temp.getChildren());
-      for(let i = 0; i < children.length; i++){
-        const ch = children[i];
-        drawLayer.add(ch);
-        enableSelect(ch);
+      let arr = [];
+      const parsed = JSON.parse(jsonStr);
+      if(Array.isArray(parsed)){
+        arr = parsed;
+      } else if(parsed && parsed.className === 'Layer' && Array.isArray(parsed.children)){
+        // oud formaat → converteer
+        arr = parsed.children;
       }
-      temp.destroy();
+      for(let i = 0; i < arr.length; i++){
+        try{
+          const node = Konva.Node.create(arr[i]);
+          if(node){
+            drawLayer.add(node);
+            enableSelect(node);
+          }
+        }catch(e){ logErr('Node', String(e && e.message || e)); }
+      }
     }catch(e){ logErr('JSON', String(e && e.message || e)); }
   }
   drawLayer.add(transformer);
@@ -842,6 +856,7 @@ function applyJSON(json){
   lastCommitJson = '';
   lastCommitTime = 0;
 }
+
 function clearLayer(){
   const layer = transformer.getLayer();
   transformer.remove();
@@ -1042,6 +1057,7 @@ document.getElementById('btn-export-all').addEventListener('click', async () => 
   const zip = new SimpleZip();
   const prevIndex = currentIndex;
   const includeJson = document.getElementById('includeProjectJson').checked;
+  // imageFiles is al gesorteerd op naam, dus ZIP volgt dezelfde volgorde
   for(let i=0; i<imageFiles.length; i++){
     if(currentIndex !== i){
       if(currentIndex >= 0){ selectNode(null); flushAndSave(); }
@@ -1061,7 +1077,7 @@ document.getElementById('btn-export-all').addEventListener('click', async () => 
     flushAndSave();
     const imgs = imageFiles.map(it => ({ id:it.id, name:it.name, dataURL:it.dataURL, w:it.w, h:it.h }));
     const sc = {}; imgs.forEach(it => { sc[it.id] = scenes[it.id] || EMPTY_JSON; });
-    const data = { version:3, projectName:(document.getElementById('projectName').value||'').trim(), images:imgs, scenes:sc };
+    const data = { version:4, projectName:(document.getElementById('projectName').value||'').trim(), images:imgs, scenes:sc };
     const jsonBlob = new Blob([JSON.stringify(data)], { type:'application/json' });
     zip.add('project.json', new Uint8Array(await jsonBlob.arrayBuffer()), new Date());
   }
@@ -1074,7 +1090,7 @@ document.getElementById('btn-export-project').addEventListener('click', () => {
     flushAndSave();
     const imgs = imageFiles.map(it => ({ id:it.id, name:it.name, dataURL:it.dataURL, w:it.w, h:it.h }));
     const sc = {}; imgs.forEach(it => { sc[it.id] = scenes[it.id] || EMPTY_JSON; });
-    const data = { version:3, projectName:(document.getElementById('projectName').value||'').trim(), images:imgs, scenes:sc };
+    const data = { version:4, projectName:(document.getElementById('projectName').value||'').trim(), images:imgs, scenes:sc };
     const base = (document.getElementById('projectName').value || 'project')
       .replace(/[\\/:*?"<>|]+/g,'_').replace(/\s+/g,' ').trim() || 'project';
     downloadBlob(base + '.json', new Blob([JSON.stringify(data, null, 2)], { type:'application/json' }));
@@ -1093,6 +1109,7 @@ projInput.addEventListener('change', async e => {
       id: it.id || newId(), name: it.name || ('beeld-'+(i+1)+'.png'),
       dataURL: it.dataURL || '', w: it.w || 0, h: it.h || 0,
     }));
+    imgs.sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { numeric: true, sensitivity: 'base' }));
     imageFiles = imgs;
     for(const k in scenes) delete scenes[k];
     for(const it of imgs){
@@ -1155,7 +1172,7 @@ document.addEventListener('touchend', e => {
 }, { passive:false });
 
 updateBottomBar();
-console.log('Tekenapp Fiber v8');
+console.log('Tekenapp Fiber v9');
 })();
 </script>
 </body>
