@@ -13,7 +13,6 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;overscroll-behavior:non
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;height:100dvh}
 button{touch-action:manipulation;user-select:none;-webkit-user-select:none;font-family:inherit}
 
-/* Toolbar */
 .toolbar{flex:0 0 auto;background:#fff;border-bottom:1px solid var(--line);padding-top:calc(4px + env(safe-area-inset-top));padding-bottom:4px}
 .tbar-row{display:flex;gap:6px;align-items:center;padding:4px 8px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;white-space:nowrap;scrollbar-width:none}
 .tbar-row::-webkit-scrollbar{display:none}
@@ -29,14 +28,15 @@ button{touch-action:manipulation;user-select:none;-webkit-user-select:none;font-
 .ltype-btn{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:64px;height:40px;padding:0 8px;border:2px solid var(--line);background:#fff;border-radius:8px;cursor:pointer;flex-shrink:0}
 .ltype-btn.active{border-color:var(--accent);background:#EAF2FB}
 .ltype-btn .swatch{width:52px;height:4px;border-radius:2px;flex-shrink:0}
+.ltype-btn .swatch.thin{height:2px}
 .ltype-btn .swatch.dashed{height:5px}
+.ltype-btn .swatch.dashed.thin{height:3px}
 .ltype-btn .swatch.dashed.black{background-image:repeating-linear-gradient(90deg,#000 0 8px,transparent 8px 14px)}
 .ltype-btn .swatch.dashed.brown{background-image:repeating-linear-gradient(90deg,#A0522D 0 8px,transparent 8px 14px)}
 .ltype-btn .swatch.dashed.green{background-image:repeating-linear-gradient(90deg,#00B050 0 8px,transparent 8px 14px)}
-.ltype-btn .swatch.dashed.orange{background-image:repeating-linear-gradient(90deg,#FFC000 0 8px,transparent 8px 14px)}
+.ltype-btn .swatch.dashed.orange{background-image:repeating-linear-gradient(90deg,#FFC000 0 5px,transparent 5px 9px)}
 .ltype-btn .lbl{font-size:8px;color:#555;line-height:1;letter-spacing:.2px}
 
-/* Main */
 #main{flex:1;min-height:0;display:grid;grid-template-columns:82px 1fr;overflow:hidden}
 #symbol-bar{background:#fff;border-right:1px solid var(--line);overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:4px 3px;display:flex;flex-direction:column;gap:4px}
 #symbol-bar::-webkit-scrollbar{width:0}
@@ -50,7 +50,6 @@ button{touch-action:manipulation;user-select:none;-webkit-user-select:none;font-
 #canvas-wrapper.drawing{touch-action:none;overflow:hidden}
 #stage{display:block;user-select:none;-webkit-user-select:none}
 
-/* Landscape */
 @media (orientation: landscape) and (min-width: 900px){
   #main{grid-template-columns:180px 1fr}
   #symbol-bar{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:6px;align-content:start}
@@ -67,19 +66,8 @@ button{touch-action:manipulation;user-select:none;-webkit-user-select:none;font-
   .ltype-btn .swatch{width:72px}
 }
 
-/* Bottom bar */
-.bottom-bar{
-  flex:0 0 auto;display:flex;gap:6px;align-items:center;
-  padding:6px 10px;
-  padding-bottom:calc(6px + env(safe-area-inset-bottom));
-  background:#fff;border-top:1px solid var(--line);z-index:100;
-}
-.bb-btn{
-  border:1px solid var(--line);background:#fff;border-radius:8px;
-  padding:0 12px;height:42px;min-width:48px;
-  font-size:16px;font-weight:700;cursor:pointer;color:#333;
-  display:inline-flex;align-items:center;justify-content:center;gap:6px;flex-shrink:0;
-}
+.bottom-bar{flex:0 0 auto;display:flex;gap:6px;align-items:center;padding:6px 10px;padding-bottom:calc(6px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid var(--line);z-index:100}
+.bb-btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:0 12px;height:42px;min-width:48px;font-size:16px;font-weight:700;cursor:pointer;color:#333;display:inline-flex;align-items:center;justify-content:center;gap:6px;flex-shrink:0}
 .bb-btn:active{background:#f1f3f5}
 .bb-btn:disabled{opacity:.35}
 .bb-btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
@@ -87,7 +75,6 @@ button{touch-action:manipulation;user-select:none;-webkit-user-select:none;font-
 .bb-btn .ico{font-size:18px;line-height:1}
 .bb-info{font-size:13px;color:#666;padding:0 10px;font-weight:600;margin-left:auto;white-space:nowrap}
 
-/* Drawers */
 .panel{position:fixed;top:0;bottom:0;width:min(90vw,380px);z-index:2000;background:#fff;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.3);transition:transform .25s ease;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
 .panel-left{left:0;transform:translateX(-105%)}
 .panel-right{right:0;transform:translateX(105%)}
@@ -100,7 +87,6 @@ body.drawer-right .panel-right{transform:translateX(0)}
 #backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1500;display:none}
 body.drawer-left #backdrop,body.drawer-right #backdrop{display:block}
 
-/* Forms */
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
 .row:last-child{margin-bottom:0}
 .row strong{font-size:14px}
@@ -118,7 +104,7 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--brand)}
 .pen-dot{width:8px;height:8px;border-radius:50%;background:currentColor}
 .mode-indicator{padding:0 12px;height:40px;border-radius:8px;background:#FFF3CD;color:#856404;font-weight:600;font-size:12px;flex-shrink:0;border:1px solid #FFE69C;display:inline-flex;align-items:center}
 
-#mini-error-console{position:fixed;right:8px;bottom:8px;max-width:min(42ch,80vw);max-height:30vh;overflow:auto;font:11px/1.35 ui-monospace,Menlo,monospace;background:#111;color:#f66;padding:8px 10px;border-radius:10px;z-index:999999;white-space:pre-wrap;pointer-events:none;opacity:0;transition:opacity .3s;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+#mini-error-console{position:fixed;right:8px;bottom:80px;max-width:min(42ch,80vw);max-height:30vh;overflow:auto;font:11px/1.35 ui-monospace,Menlo,monospace;background:#111;color:#f66;padding:8px 10px;border-radius:10px;z-index:999999;white-space:pre-wrap;pointer-events:none;opacity:0;transition:opacity .3s;box-shadow:0 6px 18px rgba(0,0,0,.35)}
 #mini-error-console.show{opacity:1}
 #mini-error-console b{color:#fff}
 </style>
@@ -230,7 +216,29 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--brand)}
 <script>
 (function(){
 'use strict';
-if(typeof Konva !== 'undefined'){ Konva.pixelRatio = 1; }
+
+if(typeof Konva !== 'undefined'){
+  if(typeof Konva.pixelRatio !== 'undefined') Konva.pixelRatio = 1;
+  if(!Array.prototype.toArray){
+    try{
+      Object.defineProperty(Array.prototype, 'toArray', {
+        value: function(){ return this.slice ? this.slice() : Array.from(this); },
+        writable:false, configurable:true, enumerable:false
+      });
+    }catch(e){}
+  }
+}
+
+function toArr(x){
+  if(!x) return [];
+  if(Array.isArray(x)) return x;
+  if(typeof x.toArray === 'function'){ try{ return x.toArray(); }catch(e){} }
+  if(typeof x.length === 'number') return Array.prototype.slice.call(x);
+  return [];
+}
+function layerChildrenNoTransformer(){
+  return toArr(drawLayer.getChildren()).filter(n => n !== transformer);
+}
 
 const errBox = document.getElementById('mini-error-console');
 let errTimer = null;
@@ -252,15 +260,14 @@ if(typeof Konva === 'undefined'){
 }
 
 const LINE_TYPES = {
-  publiek:   { label:'PUBLIEK',   color:'#000000', width:8,  dash:[16,12], dashedClass:'black' },
-  prive:     { label:'PRIVÉ',     color:'#A0522D', width:6,  dash:[16,12], dashedClass:'brown' },
-  gevel:     { label:'GEVEL',     color:'#7030A0', width:6,  dash:null },
-  gem_zicht: { label:'GEM ZIEN',  color:'#00B050', width:6,  dash:null },
-  gem_niet:  { label:'GEM NIET',  color:'#00B050', width:6,  dash:[14,10], dashedClass:'green' },
-  ind_zicht: { label:'IND ZIEN',  color:'#FFC000', width:6,  dash:null },
-  ind_niet:  { label:'IND NIET',  color:'#FFC000', width:6,  dash:[14,10], dashedClass:'orange' },
+  publiek:   { label:'PUBLIEK',   color:'#000000', width:8,  dash:[16,12], dashedClass:'black',  pointerLen:18 },
+  prive:     { label:'PRIVÉ',     color:'#A0522D', width:6,  dash:[16,12], dashedClass:'brown',  pointerLen:14 },
+  gevel:     { label:'GEVEL',     color:'#7030A0', width:6,  dash:null,                          pointerLen:14 },
+  gem_zicht: { label:'GEM ZIEN',  color:'#00B050', width:6,  dash:null,                          pointerLen:14 },
+  gem_niet:  { label:'GEM NIET',  color:'#00B050', width:6,  dash:[14,10], dashedClass:'green',  pointerLen:14 },
+  ind_zicht: { label:'IND ZIEN',  color:'#FFC000', width:3,  dash:null,                          pointerLen:7  },
+  ind_niet:  { label:'IND NIET',  color:'#FFC000', width:3,  dash:[10,7],  dashedClass:'orange', pointerLen:7  },
 };
-
 const SYMBOLS = {
   intrede_onder: { label:'Ondergronds', kind:'triangle', color:'#1E88E5' },
   intrede_boven: { label:'Bovengronds', kind:'triangle', color:'#7030A0' },
@@ -269,7 +276,6 @@ const SYMBOLS = {
   ftu:           { label:'FTU',         kind:'square',   color:'#FFC000' },
   boorgat:       { label:'Boorgat',     kind:'circle',   color:'#E00000' },
 };
-
 const TEXT_COLOR = '#FFC000';
 
 let imageFiles = [];
@@ -332,15 +338,17 @@ function selectNode(n){
 }
 function refreshDraggables(){
   const drag = (currentTool === 'select');
-  drawLayer.getChildren(n => n !== transformer).forEach(n => n.draggable(drag));
+  layerChildrenNoTransformer().forEach(n => n.draggable(drag));
+}
+function commitDragEnd(){
+  transformer.moveToTop();
+  commitHistory(); saveScene(); isDirty = false;
 }
 function enableSelect(node){
   node.on('pointerdown', () => { if(currentTool === 'select') selectNode(node); });
   node.on('dragmove transform', setDirty);
-  node.on('dragend transformend', () => {
-    transformer.moveToTop();
-    commitHistory(); saveScene(); isDirty = false;
-  });
+  node.on('dragend', commitDragEnd);
+  node.on('transformend', commitDragEnd);
 }
 
 const snapToggle = document.getElementById('snapToggle');
@@ -350,10 +358,10 @@ function nearestSnapPoint(p, thr){
   thr = thr || 16;
   if(!snapEnabled) return null;
   let best = null, bd = thr*thr;
-  drawLayer.getChildren(n => n !== transformer).forEach(s => {
+  layerChildrenNoTransformer().forEach(s => {
     if(s === currentShape) return;
     if(s.className === 'Line' || s.className === 'Arrow'){
-      const pts = s.points();
+      const pts = s.points() || [];
       for(let i=0; i<pts.length; i+=2){
         const dx = p.x - pts[i], dy = p.y - pts[i+1];
         const d = dx*dx + dy*dy;
@@ -414,8 +422,8 @@ function beginShape(pos){
       points:[pos.x, pos.y, pos.x, pos.y],
       stroke:t.color, fill:t.color, strokeWidth:t.width,
       dash:dashed,
-      pointerLength:Math.max(14, t.width * 2),
-      pointerWidth:Math.max(14, t.width * 2),
+      pointerLength:(t.pointerLen || Math.max(14, t.width * 2)),
+      pointerWidth:(t.pointerLen || Math.max(14, t.width * 2)),
       pointerAtBeginning:false,
       lineCap:'round', lineJoin:'round',
       hitStrokeWidth:20, perfectDrawEnabled:false, shadowForStrokeEnabled:false,
@@ -474,14 +482,18 @@ function scheduleUpdate(){
   });
 }
 
+function isDrawingTool(){
+  return currentTool === 'line' || currentTool === 'arrow' || currentTool === 'text';
+}
+
 stage.on('pointerdown', e => {
   const evt = e.evt || {};
   const type = evt.pointerType || 'mouse';
+
   if(isPenOnly() && type === 'touch'){
     if(e.target === stage || e.target.getLayer() === bgLayer) selectNode(null);
     return;
   }
-  if(e.target === stage || e.target.getLayer() === bgLayer) selectNode(null);
 
   if(pendingSymbol){
     const pos = stage.getPointerPosition();
@@ -489,15 +501,21 @@ stage.on('pointerdown', e => {
     placeSymbol(pendingSymbol, pos.x, pos.y);
     return;
   }
-  if(e.target !== stage && e.target.getLayer() !== bgLayer) return;
-  if(currentTool !== 'line' && currentTool !== 'arrow' && currentTool !== 'text') return;
 
-  let pos = stage.getPointerPosition();
-  if(!pos) return;
-  const s = nearestSnapPoint(pos, 18);
-  if(s) pos = s;
-  beginShape(pos);
-  updateWrapperMode();
+  if(isDrawingTool()){
+    if(e.target === stage || e.target.getLayer() === bgLayer) selectNode(null);
+    let pos = stage.getPointerPosition();
+    if(!pos) return;
+    const s = nearestSnapPoint(pos, 18);
+    if(s) pos = s;
+    beginShape(pos);
+    updateWrapperMode();
+    return;
+  }
+
+  if(currentTool === 'select'){
+    if(e.target === stage || e.target.getLayer() === bgLayer) selectNode(null);
+  }
 });
 
 stage.on('pointermove', () => {
@@ -548,13 +566,15 @@ setTool('select');
     const b = document.createElement('button');
     b.className = 'ltype-btn' + (key === currentLineType ? ' active' : '');
     b.dataset.type = key;
-    const swatchClass = 'swatch' + (def.dash ? ' dashed ' + (def.dashedClass||'') : '');
+    const isThin = def.width <= 4;
+    const swatchClass = 'swatch' + (isThin ? ' thin' : '') + (def.dash ? ' dashed ' + (def.dashedClass||'') : '');
     const styleAttr = def.dash ? 'color:'+def.color : 'background:'+def.color;
     b.innerHTML = '<span class="'+swatchClass+'" style="'+styleAttr+'"></span><span class="lbl">'+def.label+'</span>';
     b.addEventListener('click', () => {
       currentLineType = key;
       document.querySelectorAll('.ltype-btn').forEach(x => x.classList.remove('active'));
       b.classList.add('active');
+      setTool('line');   // automatisch naar Lijn
     });
     row.appendChild(b);
   });
@@ -565,10 +585,9 @@ function symbolSVG(kind, color){
   if(kind === 'triangle') return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 30 30"><polygon points="15,3 28,27 2,27" fill="'+color+'" stroke="#000" stroke-width="1.5"/></svg>';
   if(kind === 'diamond')  return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 30 30"><polygon points="15,2 28,15 15,28 2,15" fill="'+color+'" stroke="#000" stroke-width="1.5"/></svg>';
   if(kind === 'square')   return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 30 30"><rect x="3" y="3" width="24" height="24" fill="'+color+'" stroke="#000" stroke-width="1.5"/></svg>';
-  if(kind === 'circle')   return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 30 30"><circle cx="15" cy="15" r="12" fill="'+color+'" stroke="#000" stroke-width="1.5"/></svg>';
+  if(kind === 'circle')   return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 30 30"><circle cx="15" cy="15" r="10" fill="'+color+'" stroke="#000" stroke-width="1.5"/></svg>';
   return '';
 }
-
 (function buildSymbolBar(){
   const bar = document.getElementById('symbol-bar');
   Object.keys(SYMBOLS).forEach(key => {
@@ -599,10 +618,9 @@ function makeSymbolShape(kind, color){
   if(kind === 'triangle') return new Konva.RegularPolygon({ sides:3, radius:22, fill:color, stroke:'#000', strokeWidth:1.5, perfectDrawEnabled:false });
   if(kind === 'diamond')  return new Konva.RegularPolygon({ sides:4, radius:22, fill:color, stroke:'#000', strokeWidth:1.5, perfectDrawEnabled:false });
   if(kind === 'square')   return new Konva.Rect({ x:-20, y:-20, width:40, height:40, fill:color, stroke:'#000', strokeWidth:1.5, perfectDrawEnabled:false });
-  if(kind === 'circle')   return new Konva.Circle({ radius:16, fill:color, stroke:'#000', strokeWidth:1.5, perfectDrawEnabled:false });
-  return new Konva.Circle({ radius:16, fill:color });
+  if(kind === 'circle')   return new Konva.Circle({ radius:13, fill:color, stroke:'#000', strokeWidth:1.5, perfectDrawEnabled:false });
+  return new Konva.Circle({ radius:13, fill:color });
 }
-
 function placeSymbol(key, x, y){
   const def = SYMBOLS[key];
   if(!def) return;
@@ -630,7 +648,6 @@ fileInput.addEventListener('change', async e => {
   await handleFiles(files);
   e.target.value = '';
 });
-
 function newId(){ return 'img-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,8); }
 
 async function handleFiles(files){
@@ -650,7 +667,7 @@ async function handleFiles(files){
   if(!good.length) return;
   const had = imageFiles.length > 0;
   if(!had){
-    if(drawLayer.getChildren(n => n !== transformer).length) clearLayer();
+    if(layerChildrenNoTransformer().length) clearLayer();
     imageFiles = good;
     currentIndex = 0; currentId = good[0].id;
     good.forEach(it => { scenes[it.id] = EMPTY_JSON; history[it.id] = { past:[EMPTY_JSON], future:[] }; });
@@ -688,16 +705,12 @@ function updateBottomBar(){
   const del  = document.getElementById('bb-delete');
   if(imageFiles.length){
     info.textContent = (currentIndex+1) + ' / ' + imageFiles.length;
-    prev.disabled = false;
-    next.disabled = false;
-    exp.disabled = false;
-    del.disabled = false;
+    prev.disabled = false; next.disabled = false;
+    exp.disabled = false; del.disabled = false;
   } else {
     info.textContent = '– / –';
-    prev.disabled = true;
-    next.disabled = true;
-    exp.disabled = true;
-    del.disabled = true;
+    prev.disabled = true; next.disabled = true;
+    exp.disabled = true; del.disabled = true;
   }
 }
 
@@ -788,12 +801,9 @@ document.getElementById('btn-rename-photo').addEventListener('click', () => {
   renderThumbs();
 });
 
-/* ============ Bottom bar actions ============ */
 document.getElementById('bb-prev').addEventListener('click', () => switchImage(-1));
 document.getElementById('bb-next').addEventListener('click', () => switchImage(1));
-document.getElementById('bb-export').addEventListener('click', () => {
-  document.getElementById('btn-export').click();
-});
+document.getElementById('bb-export').addEventListener('click', () => document.getElementById('btn-export').click());
 document.getElementById('bb-delete').addEventListener('click', () => {
   const cur = imageFiles[currentIndex];
   const nm = cur ? cur.name : '';
@@ -801,7 +811,6 @@ document.getElementById('bb-delete').addEventListener('click', () => {
   document.getElementById('btn-remove-photo').click();
 });
 
-/* ============ History (robust 1-step) ============ */
 let lastCommitJson = '';
 let lastCommitTime = 0;
 
@@ -817,7 +826,12 @@ function applyJSON(json){
   if(json){
     try{
       const temp = Konva.Node.create(json);
-      temp.getChildren().toArray().forEach(ch => { drawLayer.add(ch); enableSelect(ch); });
+      const children = toArr(temp.getChildren());
+      for(let i = 0; i < children.length; i++){
+        const ch = children[i];
+        drawLayer.add(ch);
+        enableSelect(ch);
+      }
       temp.destroy();
     }catch(e){ logErr('JSON', String(e && e.message || e)); }
   }
@@ -825,7 +839,6 @@ function applyJSON(json){
   drawLayer.batchDraw();
   selectNode(null);
   refreshDraggables();
-  // reset anti-dupe markers na verversen van de staat
   lastCommitJson = '';
   lastCommitTime = 0;
 }
@@ -845,9 +858,9 @@ function commitHistory(){
   const json = snapshot();
   const h = history[currentId];
   const last = h.past[h.past.length-1];
-  if(last === json) return;                              // zelfde staat, niets te doen
+  if(last === json) return;
   const now = Date.now();
-  if(json === lastCommitJson && now - lastCommitTime < 300) return; // anti-dubbele commit bij dragend+transformend
+  if(json === lastCommitJson && now - lastCommitTime < 300) return;
   h.past.push(json);
   if(h.past.length > 80) h.past.shift();
   h.future = [];
@@ -1142,7 +1155,7 @@ document.addEventListener('touchend', e => {
 }, { passive:false });
 
 updateBottomBar();
-console.log('Tekenapp Fiber v6');
+console.log('Tekenapp Fiber v8');
 })();
 </script>
 </body>
