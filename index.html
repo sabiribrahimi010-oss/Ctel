@@ -67,6 +67,26 @@ button{touch-action:manipulation;user-select:none;-webkit-user-select:none;font-
   .ltype-btn .swatch{width:72px}
 }
 
+/* Bottom bar */
+.bottom-bar{
+  flex:0 0 auto;display:flex;gap:6px;align-items:center;
+  padding:6px 10px;
+  padding-bottom:calc(6px + env(safe-area-inset-bottom));
+  background:#fff;border-top:1px solid var(--line);z-index:100;
+}
+.bb-btn{
+  border:1px solid var(--line);background:#fff;border-radius:8px;
+  padding:0 12px;height:42px;min-width:48px;
+  font-size:16px;font-weight:700;cursor:pointer;color:#333;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;flex-shrink:0;
+}
+.bb-btn:active{background:#f1f3f5}
+.bb-btn:disabled{opacity:.35}
+.bb-btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+.bb-btn.danger{background:#fff;color:#C00000;border-color:#e8b5b5}
+.bb-btn .ico{font-size:18px;line-height:1}
+.bb-info{font-size:13px;color:#666;padding:0 10px;font-weight:600;margin-left:auto;white-space:nowrap}
+
 /* Drawers */
 .panel{position:fixed;top:0;bottom:0;width:min(90vw,380px);z-index:2000;background:#fff;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.3);transition:transform .25s ease;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
 .panel-left{left:0;transform:translateX(-105%)}
@@ -126,6 +146,14 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--brand)}
 <div id="main">
   <aside id="symbol-bar"></aside>
   <main id="canvas-wrapper"><div id="stage"></div></main>
+</div>
+
+<div class="bottom-bar">
+  <button id="bb-prev" class="bb-btn" title="Vorige foto"><span class="ico">←</span></button>
+  <button id="bb-next" class="bb-btn" title="Volgende foto"><span class="ico">→</span></button>
+  <button id="bb-export" class="bb-btn primary" title="Download huidige foto"><span class="ico">📥</span></button>
+  <button id="bb-delete" class="bb-btn danger" title="Verwijder huidige foto"><span class="ico">🗑</span></button>
+  <span class="bb-info" id="bb-info">– / –</span>
 </div>
 
 <aside id="panel-left" class="panel panel-left">
@@ -649,6 +677,28 @@ function renderThumbs(){
     });
     thumbsEl.appendChild(b);
   });
+  updateBottomBar();
+}
+
+function updateBottomBar(){
+  const info = document.getElementById('bb-info');
+  const prev = document.getElementById('bb-prev');
+  const next = document.getElementById('bb-next');
+  const exp  = document.getElementById('bb-export');
+  const del  = document.getElementById('bb-delete');
+  if(imageFiles.length){
+    info.textContent = (currentIndex+1) + ' / ' + imageFiles.length;
+    prev.disabled = false;
+    next.disabled = false;
+    exp.disabled = false;
+    del.disabled = false;
+  } else {
+    info.textContent = '– / –';
+    prev.disabled = true;
+    next.disabled = true;
+    exp.disabled = true;
+    del.disabled = true;
+  }
 }
 
 function fitImageToStage(meta){
@@ -709,7 +759,7 @@ document.getElementById('btn-remove-photo').addEventListener('click', () => {
     currentIndex = -1; currentId = null;
     fitImageToStage(null); clearLayer();
     curName.textContent = '–'; thumbsEl.innerHTML = '';
-    updateUndoRedo();
+    updateUndoRedo(); updateBottomBar();
     return;
   }
   if(currentIndex >= imageFiles.length) currentIndex = imageFiles.length-1;
@@ -723,7 +773,7 @@ document.getElementById('btn-clear-queue').addEventListener('click', () => {
   fitImageToStage(null); clearLayer();
   curName.textContent = '–'; thumbsEl.innerHTML = '';
   const fi = document.getElementById('file-input'); if(fi) fi.value = '';
-  updateUndoRedo();
+  updateUndoRedo(); updateBottomBar();
 });
 
 document.getElementById('btn-rename-photo').addEventListener('click', () => {
@@ -737,6 +787,23 @@ document.getElementById('btn-rename-photo').addEventListener('click', () => {
   curName.textContent = cur.name;
   renderThumbs();
 });
+
+/* ============ Bottom bar actions ============ */
+document.getElementById('bb-prev').addEventListener('click', () => switchImage(-1));
+document.getElementById('bb-next').addEventListener('click', () => switchImage(1));
+document.getElementById('bb-export').addEventListener('click', () => {
+  document.getElementById('btn-export').click();
+});
+document.getElementById('bb-delete').addEventListener('click', () => {
+  const cur = imageFiles[currentIndex];
+  const nm = cur ? cur.name : '';
+  if(!confirm('Verwijder foto "' + nm + '"?')) return;
+  document.getElementById('btn-remove-photo').click();
+});
+
+/* ============ History (robust 1-step) ============ */
+let lastCommitJson = '';
+let lastCommitTime = 0;
 
 function snapshot(){
   const layer = transformer.getLayer();
@@ -758,6 +825,9 @@ function applyJSON(json){
   drawLayer.batchDraw();
   selectNode(null);
   refreshDraggables();
+  // reset anti-dupe markers na verversen van de staat
+  lastCommitJson = '';
+  lastCommitTime = 0;
 }
 function clearLayer(){
   const layer = transformer.getLayer();
@@ -768,35 +838,43 @@ function clearLayer(){
 }
 function saveScene(){ if(currentId) scenes[currentId] = snapshot(); }
 function flushAndSave(){ if(isDirty){ commitHistory(); saveScene(); isDirty = false; } }
+
 function commitHistory(){
   if(!currentId) return;
   if(!history[currentId]) history[currentId] = { past:[EMPTY_JSON], future:[] };
   const json = snapshot();
   const h = history[currentId];
   const last = h.past[h.past.length-1];
-  if(last !== json){
-    h.past.push(json);
-    if(h.past.length > 80) h.past.shift();
-    h.future = [];
-    scenes[currentId] = json;
-  }
+  if(last === json) return;                              // zelfde staat, niets te doen
+  const now = Date.now();
+  if(json === lastCommitJson && now - lastCommitTime < 300) return; // anti-dubbele commit bij dragend+transformend
+  h.past.push(json);
+  if(h.past.length > 80) h.past.shift();
+  h.future = [];
+  scenes[currentId] = json;
+  lastCommitJson = json;
+  lastCommitTime = now;
   updateUndoRedo();
 }
 function undo(){
   if(!currentId) return;
   const h = history[currentId];
   if(!h || h.past.length <= 1) return;
-  const cur = h.past.pop(); h.future.push(cur);
+  const cur = h.past.pop();
+  h.future.push(cur);
   const prev = h.past[h.past.length-1];
-  applyJSON(prev); scenes[currentId] = prev;
+  applyJSON(prev);
+  scenes[currentId] = prev;
   updateUndoRedo();
 }
 function redo(){
   if(!currentId) return;
   const h = history[currentId];
   if(!h || !h.future.length) return;
-  const next = h.future.pop(); h.past.push(next);
-  applyJSON(next); scenes[currentId] = next;
+  const next = h.future.pop();
+  h.past.push(next);
+  applyJSON(next);
+  scenes[currentId] = next;
   updateUndoRedo();
 }
 function updateUndoRedo(){
@@ -899,9 +977,10 @@ function downloadBlob(name, blob){
 }
 document.getElementById('btn-export').addEventListener('click', async () => {
   try{
+    if(currentIndex < 0){ logErr('Export', 'Geen foto geladen'); return; }
     const url = await exportCroppedURL();
     const blob = await compressToJpeg(url, 500);
-    const base = (currentIndex >= 0 && imageFiles[currentIndex] && imageFiles[currentIndex].name)
+    const base = (imageFiles[currentIndex] && imageFiles[currentIndex].name)
       ? imageFiles[currentIndex].name.replace(/\.[^.]+$/,'') : 'tekening';
     downloadBlob(base + '-annotated.jpg', blob);
   }catch(e){ logErr('Export', String(e && e.message || e)); }
@@ -1012,7 +1091,7 @@ projInput.addEventListener('change', async e => {
     document.getElementById('projectName').value = data.projectName || '';
     renderThumbs();
     if(imgs.length) loadImageAt(0);
-    else { fitImageToStage(null); curName.textContent = '–'; updateUndoRedo(); }
+    else { fitImageToStage(null); curName.textContent = '–'; updateUndoRedo(); updateBottomBar(); }
     e.target.value = '';
     logErr('OK', 'Project geladen');
   }catch(err){
@@ -1062,7 +1141,8 @@ document.addEventListener('touchend', e => {
   lastTouchEnd = now;
 }, { passive:false });
 
-console.log('Tekenapp Fiber v5');
+updateBottomBar();
+console.log('Tekenapp Fiber v6');
 })();
 </script>
 </body>
