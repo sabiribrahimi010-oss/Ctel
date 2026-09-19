@@ -11,193 +11,189 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0;height:100%;overflow:hidden;overscroll-behavior:none;position:fixed;width:100%}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;height:100dvh}
-button,.btn,.chip,.sym,.linetype{touch-action:manipulation;user-select:none;-webkit-user-select:none;font-family:inherit}
+button{touch-action:manipulation;user-select:none;-webkit-user-select:none;font-family:inherit}
 
 /* Toolbar */
-.toolbar{flex:0 0 auto;display:flex;align-items:center;gap:6px;padding:6px 8px;padding-top:calc(6px + env(safe-area-inset-top));background:#fff;border-bottom:1px solid var(--line);overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;white-space:nowrap}
-.toolbar::-webkit-scrollbar{height:0}
-.btn{border:none;background:var(--brand);color:#fff;border-radius:8px;padding:9px 13px;font-size:14px;font-weight:600;cursor:pointer;min-height:40px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}
-.btn:active{background:var(--brand-dark)}
-.btn:disabled{opacity:.4;cursor:not-allowed}
-.btn.active{background:#fff;color:var(--brand-dark);border:2px solid var(--brand-dark);padding:7px 11px}
-.icon-btn{width:40px;height:40px;padding:0;border:1px solid var(--line);background:#fff;color:#333;border-radius:8px;font-size:18px;cursor:pointer;flex-shrink:0}
-.icon-btn:active{background:#f1f3f5}
-.divider{width:1px;height:26px;background:var(--line);margin:0 2px;flex-shrink:0}
-.pen-indicator{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:20px;background:#f1f3f5;font-size:12px;font-weight:600;color:#666;flex-shrink:0}
-.pen-indicator.active{background:#4EA72E;color:#fff}
-.pen-dot{width:8px;height:8px;border-radius:50%;background:currentColor}
-.mode-indicator{padding:6px 12px;border-radius:8px;background:#FFF3CD;color:#856404;font-weight:600;font-size:12px;flex-shrink:0;border:1px solid #FFE69C}
+.toolbar{flex:0 0 auto;background:#fff;border-bottom:1px solid var(--line);padding-top:calc(4px + env(safe-area-inset-top));padding-bottom:4px}
+.tbar-row{display:flex;gap:6px;align-items:center;padding:4px 8px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;white-space:nowrap;scrollbar-width:none}
+.tbar-row::-webkit-scrollbar{display:none}
+.tbar-sep{width:1px;height:24px;background:var(--line);flex-shrink:0;margin:0 2px}
 
-/* Layout */
-#container{flex:1;min-height:0;display:grid;grid-template-columns:1fr;position:relative}
+.btn{border:none;background:var(--brand);color:#fff;border-radius:8px;padding:0 12px;font-size:14px;font-weight:600;cursor:pointer;height:40px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center}
+.btn:active{background:var(--brand-dark)}
+.btn:disabled{opacity:.4}
+.btn.active{background:#fff;color:var(--brand-dark);border:2px solid var(--brand-dark);padding:0 10px}
+.icon-btn{width:40px;height:40px;padding:0;border:1px solid var(--line);background:#fff;color:#333;border-radius:8px;font-size:18px;cursor:pointer;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center}
+.icon-btn:active{background:#f1f3f5}
+
+.ltype-btn{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:64px;height:40px;padding:0 8px;border:2px solid var(--line);background:#fff;border-radius:8px;cursor:pointer;flex-shrink:0}
+.ltype-btn.active{border-color:var(--accent);background:#EAF2FB}
+.ltype-btn .swatch{width:52px;height:4px;border-radius:2px;flex-shrink:0}
+.ltype-btn .swatch.dashed{height:5px}
+.ltype-btn .swatch.dashed.black{background-image:repeating-linear-gradient(90deg,#000 0 8px,transparent 8px 14px)}
+.ltype-btn .swatch.dashed.brown{background-image:repeating-linear-gradient(90deg,#A0522D 0 8px,transparent 8px 14px)}
+.ltype-btn .swatch.dashed.green{background-image:repeating-linear-gradient(90deg,#00B050 0 8px,transparent 8px 14px)}
+.ltype-btn .swatch.dashed.orange{background-image:repeating-linear-gradient(90deg,#FFC000 0 8px,transparent 8px 14px)}
+.ltype-btn .lbl{font-size:8px;color:#555;line-height:1;letter-spacing:.2px}
+
+/* Main */
+#main{flex:1;min-height:0;display:grid;grid-template-columns:82px 1fr;overflow:hidden}
+#symbol-bar{background:#fff;border-right:1px solid var(--line);overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:4px 3px;display:flex;flex-direction:column;gap:4px}
+#symbol-bar::-webkit-scrollbar{width:0}
+.sym-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:5px 2px;border:2px solid var(--line);background:#fff;border-radius:8px;cursor:pointer;min-height:58px;flex-shrink:0}
+.sym-btn:active{background:#f1f3f5}
+.sym-btn.active{border-color:var(--accent);background:#EAF2FB}
+.sym-btn svg{display:block}
+.sym-btn .lbl{font-size:8px;color:#444;text-align:center;line-height:1;letter-spacing:.1px;padding:0 1px}
+
 #canvas-wrapper{overflow:auto;background:#e9ecef;position:relative;-webkit-overflow-scrolling:touch;user-select:none;-webkit-user-select:none;touch-action:pan-x pan-y}
 #canvas-wrapper.drawing{touch-action:none;overflow:hidden}
-#stage{user-select:none;-webkit-user-select:none;display:block}
+#stage{display:block;user-select:none;-webkit-user-select:none}
 
-.panel{background:var(--panel);display:flex;flex-direction:column;overflow:hidden}
-.panel-head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--line);font-weight:700;flex-shrink:0}
+/* Landscape */
+@media (orientation: landscape) and (min-width: 900px){
+  #main{grid-template-columns:180px 1fr}
+  #symbol-bar{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:6px;align-content:start}
+  .sym-btn{min-height:64px;padding:6px 3px}
+  .sym-btn svg{width:36px;height:36px}
+  .sym-btn .lbl{font-size:9px}
+  .btn{padding:0 14px}
+  .ltype-btn{min-width:74px}
+  .ltype-btn .swatch{width:60px}
+}
+@media (orientation: landscape) and (min-width: 1200px){
+  #main{grid-template-columns:220px 1fr}
+  .ltype-btn{min-width:86px}
+  .ltype-btn .swatch{width:72px}
+}
+
+/* Drawers */
+.panel{position:fixed;top:0;bottom:0;width:min(90vw,380px);z-index:2000;background:#fff;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.3);transition:transform .25s ease;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+.panel-left{left:0;transform:translateX(-105%)}
+.panel-right{right:0;transform:translateX(105%)}
+body.drawer-left .panel-left{transform:translateX(0)}
+body.drawer-right .panel-right{transform:translateX(0)}
+.panel-head{display:flex;align-items:center;justify-content:space-between;padding:12px;border-bottom:1px solid var(--line);font-weight:700;flex-shrink:0}
 .close-x{border:none;background:transparent;font-size:20px;cursor:pointer;width:38px;height:38px;border-radius:8px}
 .close-x:active{background:#f1f3f5}
 .panel .content{padding:12px;overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch}
+#backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1500;display:none}
+body.drawer-left #backdrop,body.drawer-right #backdrop{display:block}
 
-@media (max-width:1099px){
-  .panel{position:fixed;top:0;bottom:0;width:min(90vw,360px);z-index:2000;transition:transform .25s ease;box-shadow:0 8px 32px rgba(0,0,0,.25);padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
-  .panel-left{left:0;transform:translateX(-105%)}
-  .panel-right{right:0;transform:translateX(105%)}
-  body.drawer-left .panel-left{transform:translateX(0)}
-  body.drawer-right .panel-right{transform:translateX(0)}
-  #backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1500;display:none}
-  body.drawer-left #backdrop,body.drawer-right #backdrop{display:block}
-}
-@media (min-width:1100px){
-  #container{grid-template-columns:320px 1fr 320px;gap:10px;padding:10px}
-  .close-x,#toggle-left,#toggle-right,#backdrop{display:none}
-  .panel{border:1px solid var(--line);border-radius:12px}
-  #canvas-wrapper{border:1px solid var(--line);border-radius:12px;background:#fff}
-  .panel-head{display:none}
-  .panel .content{padding:14px}
-}
-
-/* Form */
+/* Forms */
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
 .row:last-child{margin-bottom:0}
 .row strong{font-size:14px}
 .small{font-size:12px;color:#6b7280}
 hr.sep{margin:14px 0;border:none;border-top:1px solid var(--line)}
 label.check{display:flex;align-items:center;gap:8px;font-size:14px;min-height:34px}
-input[type=number]{width:70px;padding:8px 9px;border:1px solid var(--line);border-radius:8px;font-size:14px;background:#fff}
 input[type=text]{padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:14px;width:100%;background:#fff}
 input[type=checkbox]{width:22px;height:22px;accent-color:var(--brand)}
 .hidden{display:none!important}
-
-/* Line-type palette */
-.linetype-grid{display:flex;flex-direction:column;gap:6px;margin-top:6px}
-.linetype{display:flex;align-items:center;gap:10px;padding:9px 12px;border:2px solid var(--line);background:#fff;border-radius:8px;cursor:pointer;text-align:left;min-height:44px}
-.linetype.active{border-color:var(--accent);background:#EAF2FB}
-.linetype .swatch{flex-shrink:0;width:56px;height:0;border-radius:2px}
-.linetype .lbl{font-size:13px;font-weight:600;line-height:1.15}
-
-/* Symbol palette */
-.symbols-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:6px}
-.sym{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border:2px solid var(--line);background:#fff;border-radius:8px;cursor:pointer;min-height:80px}
-.sym.active{border-color:var(--accent);background:#EAF2FB}
-.sym .pic{display:flex;align-items:center;justify-content:center;height:36px}
-.sym .lbl{font-size:10px;color:#444;text-align:center;line-height:1.1}
-
-/* Thumbs */
 .thumbs{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;max-height:120px;overflow-y:auto}
 .thumb-btn{padding:7px 11px;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer;font-weight:600;font-size:13px;min-width:38px;min-height:36px}
 .thumb-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.pen-indicator{display:inline-flex;align-items:center;gap:6px;padding:0 10px;height:40px;border-radius:20px;background:#f1f3f5;font-size:12px;font-weight:600;color:#666;flex-shrink:0}
+.pen-indicator.active{background:#4EA72E;color:#fff}
+.pen-dot{width:8px;height:8px;border-radius:50%;background:currentColor}
+.mode-indicator{padding:0 12px;height:40px;border-radius:8px;background:#FFF3CD;color:#856404;font-weight:600;font-size:12px;flex-shrink:0;border:1px solid #FFE69C;display:inline-flex;align-items:center}
 
-/* Error console */
 #mini-error-console{position:fixed;right:8px;bottom:8px;max-width:min(42ch,80vw);max-height:30vh;overflow:auto;font:11px/1.35 ui-monospace,Menlo,monospace;background:#111;color:#f66;padding:8px 10px;border-radius:10px;z-index:999999;white-space:pre-wrap;pointer-events:none;opacity:0;transition:opacity .3s;box-shadow:0 6px 18px rgba(0,0,0,.35)}
 #mini-error-console.show{opacity:1}
 #mini-error-console b{color:#fff}
-#mini-error-console .ok{color:#8f8}
 </style>
 </head>
 <body>
 
 <div class="toolbar">
-  <button id="toggle-left" class="icon-btn" title="Menu">☰</button>
-  <button id="tool-select" class="btn active">Select</button>
-  <button id="tool-line" class="btn">Lijn</button>
-  <button id="tool-text" class="btn">Tekst</button>
-  <div class="divider"></div>
-  <button id="btn-undo" class="btn" disabled>Undo</button>
-  <button id="btn-redo" class="btn" disabled>Redo</button>
-  <span id="modeIndicator" class="mode-indicator hidden">Symbool plaatsen…</span>
-  <span class="pen-indicator" id="penIndicator"><span class="pen-dot"></span>Pen</span>
-  <button id="toggle-right" class="icon-btn" title="Acties">⚙</button>
+  <div class="tbar-row">
+    <button id="toggle-left" class="icon-btn" title="Foto's">☰</button>
+    <button id="tool-select" class="btn active">Select</button>
+    <button id="tool-line" class="btn">Lijn</button>
+    <button id="tool-arrow" class="btn">Pijl</button>
+    <button id="tool-text" class="btn">Tekst</button>
+    <div class="tbar-sep"></div>
+    <button id="btn-undo" class="btn" disabled>Undo</button>
+    <button id="btn-redo" class="btn" disabled>Redo</button>
+    <span id="modeIndicator" class="mode-indicator hidden">Symbool…</span>
+    <div style="flex:1"></div>
+    <span class="pen-indicator" id="penIndicator"><span class="pen-dot"></span>Pen</span>
+    <button id="toggle-right" class="icon-btn" title="Acties">⚙</button>
+  </div>
+  <div class="tbar-row" id="linetype-row"></div>
 </div>
 
-<div id="container">
-
-  <aside id="panel-left" class="panel panel-left">
-    <div class="panel-head"><span>Menu</span><button class="close-x" data-close="left">✕</button></div>
-    <div class="content">
-
-      <div class="row"><strong>1. Foto's</strong></div>
-      <div class="row">
-        <button id="btn-load" class="btn">Bestanden kiezen…</button>
-        <input id="file-input" class="hidden" type="file" accept="image/*" multiple>
-      </div>
-      <div class="row">
-        <button id="btn-prev" class="btn">← Vorige</button>
-        <button id="btn-next" class="btn">Volgende →</button>
-      </div>
-      <div id="thumbs" class="thumbs"></div>
-
-      <hr class="sep">
-      <div class="row"><strong>2. Lijntype</strong></div>
-      <div class="small" style="margin-bottom:6px">Kies een type, dan <b>Lijn</b> in de werkbalk, sleep van A naar B.</div>
-      <div class="linetype-grid" id="linetype-grid"></div>
-
-      <hr class="sep">
-      <div class="row"><strong>3. Symbolen</strong></div>
-      <div class="small" style="margin-bottom:6px">Tik een symbool, dan op de foto om te plaatsen.</div>
-      <div class="symbols-grid" id="symbols-grid"></div>
-
-      <hr class="sep">
-      <div class="row"><strong>✍️ Apple Pencil</strong></div>
-      <label class="check"><input type="checkbox" id="penOnlyToggle" checked> Alleen pen (palm rejection)</label>
-      <div class="small">Zet <b>Scribble</b> uit in iPad Instellingen → Apple Pencil.</div>
-
-      <hr class="sep">
-      <div class="row"><strong>Opties</strong></div>
-      <label class="check"><input type="checkbox" id="snapToggle" checked> Snap naar lijnen/symbolen</label>
-    </div>
-  </aside>
-
+<div id="main">
+  <aside id="symbol-bar"></aside>
   <main id="canvas-wrapper"><div id="stage"></div></main>
-
-  <aside id="panel-right" class="panel panel-right">
-    <div class="panel-head"><span>Acties</span><button class="close-x" data-close="right">✕</button></div>
-    <div class="content">
-      <div class="row"><strong>Huidig beeld</strong></div>
-      <div class="small" id="current-name" style="word-break:break-all">–</div>
-      <hr class="sep">
-      <div class="row">
-        <button id="btn-rename-photo" class="btn">Hernoem foto</button>
-        <button id="btn-remove-photo" class="btn">Verwijder foto</button>
-      </div>
-      <div class="row">
-        <button id="btn-clear-queue" class="btn">Verwijder alle foto's</button>
-      </div>
-      <hr class="sep">
-      <div class="row"><strong>Lagen</strong></div>
-      <div class="row">
-        <button id="btn-up" class="btn" disabled>Omhoog</button>
-        <button id="btn-down" class="btn" disabled>Omlaag</button>
-        <button id="btn-delete" class="btn" disabled>Verwijder</button>
-      </div>
-      <div class="row">
-        <button id="btn-clear" class="btn">Alles wissen</button>
-      </div>
-      <hr class="sep">
-      <div class="row"><strong>Exporteren</strong></div>
-      <div class="row">
-        <button id="btn-export" class="btn">Export JPEG</button>
-        <button id="btn-export-all" class="btn">Export alles (ZIP)</button>
-      </div>
-      <label class="check"><input type="checkbox" id="includeProjectJson"> Project.json meesturen</label>
-      <hr class="sep">
-      <div class="row"><strong>Project</strong></div>
-      <div class="row">
-        <label class="small" for="projectName" style="min-width:70px">Naam:</label>
-        <input id="projectName" type="text" placeholder="bv. Wyre_MRO" />
-      </div>
-      <div class="row">
-        <button id="btn-export-project" class="btn">Opslaan</button>
-        <button id="btn-load-project" class="btn">Laden</button>
-        <input id="project-input" class="hidden" type="file" accept="application/json">
-      </div>
-    </div>
-  </aside>
 </div>
+
+<aside id="panel-left" class="panel panel-left">
+  <div class="panel-head"><span>Foto's</span><button class="close-x" data-close="left">✕</button></div>
+  <div class="content">
+    <div class="row">
+      <button id="btn-load" class="btn">Bestanden kiezen…</button>
+      <input id="file-input" class="hidden" type="file" accept="image/*" multiple>
+    </div>
+    <div class="row">
+      <button id="btn-prev" class="btn">← Vorige</button>
+      <button id="btn-next" class="btn">Volgende →</button>
+    </div>
+    <div id="thumbs" class="thumbs"></div>
+    <hr class="sep">
+    <div class="row"><strong>Opties</strong></div>
+    <label class="check"><input type="checkbox" id="snapToggle" checked> Snap naar lijnen</label>
+    <label class="check"><input type="checkbox" id="penOnlyToggle" checked> Alleen pen (palm rejection)</label>
+    <div class="small" style="margin-top:4px">Zet <b>Scribble</b> uit in iPad Instellingen → Apple Pencil.</div>
+  </div>
+</aside>
+
+<aside id="panel-right" class="panel panel-right">
+  <div class="panel-head"><span>Acties</span><button class="close-x" data-close="right">✕</button></div>
+  <div class="content">
+    <div class="row"><strong>Huidig beeld</strong></div>
+    <div class="small" id="current-name" style="word-break:break-all">–</div>
+    <hr class="sep">
+    <div class="row">
+      <button id="btn-rename-photo" class="btn">Hernoem</button>
+      <button id="btn-remove-photo" class="btn">Verwijder foto</button>
+    </div>
+    <div class="row">
+      <button id="btn-clear-queue" class="btn">Verwijder alle foto's</button>
+    </div>
+    <hr class="sep">
+    <div class="row"><strong>Lagen</strong></div>
+    <div class="row">
+      <button id="btn-up" class="btn" disabled>Omhoog</button>
+      <button id="btn-down" class="btn" disabled>Omlaag</button>
+      <button id="btn-delete" class="btn" disabled>Verwijder</button>
+    </div>
+    <div class="row">
+      <button id="btn-clear" class="btn">Alles wissen</button>
+    </div>
+    <hr class="sep">
+    <div class="row"><strong>Exporteren</strong></div>
+    <div class="row">
+      <button id="btn-export" class="btn">Export JPEG</button>
+      <button id="btn-export-all" class="btn">Export alles (ZIP)</button>
+    </div>
+    <label class="check"><input type="checkbox" id="includeProjectJson"> Project.json meesturen</label>
+    <hr class="sep">
+    <div class="row"><strong>Project</strong></div>
+    <div class="row">
+      <label class="small" for="projectName" style="min-width:60px">Naam:</label>
+      <input id="projectName" type="text" placeholder="bv. Wyre_MRO" />
+    </div>
+    <div class="row">
+      <button id="btn-export-project" class="btn">Opslaan</button>
+      <button id="btn-load-project" class="btn">Laden</button>
+      <input id="project-input" class="hidden" type="file" accept="application/json">
+    </div>
+  </div>
+</aside>
 
 <div id="backdrop"></div>
-<div id="mini-error-console" aria-live="polite">OK: console actief</div>
+<div id="mini-error-console" aria-live="polite">OK</div>
 
 <script src="https://unpkg.com/konva@9/konva.min.js"></script>
 <script>window.Konva||document.write('<script src="https://cdn.jsdelivr.net/npm/konva@9/konva.min.js"><\/script>');</script>
@@ -206,8 +202,8 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--brand)}
 <script>
 (function(){
 'use strict';
+if(typeof Konva !== 'undefined'){ Konva.pixelRatio = 1; }
 
-/* ============ Errors ============ */
 const errBox = document.getElementById('mini-error-console');
 let errTimer = null;
 function logErr(kind, msg){
@@ -217,9 +213,9 @@ function logErr(kind, msg){
   errBox.appendChild(d);
   errBox.classList.add('show');
   clearTimeout(errTimer);
-  errTimer = setTimeout(()=>errBox.classList.remove('show'), 5000);
+  errTimer = setTimeout(()=>errBox.classList.remove('show'), 4000);
 }
-window.addEventListener('error', e => logErr('Error', (e.message||'')+' @ '+(e.filename||'').split('/').pop()+':'+(e.lineno||'')));
+window.addEventListener('error', e => logErr('Error', (e.message||'')+' @ '+((e.filename||'').split('/').pop())+':'+(e.lineno||'')));
 window.addEventListener('unhandledrejection', e => logErr('Promise', String(e.reason||'unknown')));
 
 if(typeof Konva === 'undefined'){
@@ -227,27 +223,27 @@ if(typeof Konva === 'undefined'){
   return;
 }
 
-/* ============ Constants ============ */
 const LINE_TYPES = {
-  publiek:   { label:'Publiek domein',        color:'#000000', width:7,  dash:null },
-  prive:     { label:'Privé aftakking',       color:'#A0522D', width:5,  dash:null },
-  gevel:     { label:'Op gevel',              color:'#7030A0', width:5,  dash:null },
-  gem_zicht: { label:'Gemeensch. zichtbaar',  color:'#00B050', width:5,  dash:null },
-  gem_niet:  { label:'Gemeensch. niet zichtbaar', color:'#00B050', width:5, dash:[14,10] },
-  ind_zicht: { label:'Individueel zichtbaar', color:'#FFC000', width:5,  dash:null },
-  ind_niet:  { label:'Individueel niet zichtbaar', color:'#FFC000', width:5, dash:[14,10] },
+  publiek:   { label:'PUBLIEK',   color:'#000000', width:8,  dash:[16,12], dashedClass:'black' },
+  prive:     { label:'PRIVÉ',     color:'#A0522D', width:6,  dash:[16,12], dashedClass:'brown' },
+  gevel:     { label:'GEVEL',     color:'#7030A0', width:6,  dash:null },
+  gem_zicht: { label:'GEM ZIEN',  color:'#00B050', width:6,  dash:null },
+  gem_niet:  { label:'GEM NIET',  color:'#00B050', width:6,  dash:[14,10], dashedClass:'green' },
+  ind_zicht: { label:'IND ZIEN',  color:'#FFC000', width:6,  dash:null },
+  ind_niet:  { label:'IND NIET',  color:'#FFC000', width:6,  dash:[14,10], dashedClass:'orange' },
 };
 
 const SYMBOLS = {
-  intrede_onder: { label:'Ondergronds intredepunt', kind:'triangle', color:'#1E88E5' },
-  intrede_boven: { label:'Bovengronds intredepunt', kind:'triangle', color:'#7030A0' },
-  verdeelpunt:   { label:'Verdeelpunt',              kind:'diamond',  color:'#FFE600' },
-  verdeeldoos:   { label:'Verdeeldoos / floorbox',   kind:'square',   color:'#00B050' },
-  ftu:           { label:'FTU',                      kind:'square',   color:'#FFC000' },
-  boorgat:       { label:'Boorgat (brandvertragend)', kind:'circle',  color:'#E00000' },
+  intrede_onder: { label:'Ondergronds', kind:'triangle', color:'#1E88E5' },
+  intrede_boven: { label:'Bovengronds', kind:'triangle', color:'#7030A0' },
+  verdeelpunt:   { label:'Verdeelpunt', kind:'diamond',  color:'#FFE600' },
+  verdeeldoos:   { label:'Verdeeldoos', kind:'square',   color:'#00B050' },
+  ftu:           { label:'FTU',         kind:'square',   color:'#FFC000' },
+  boorgat:       { label:'Boorgat',     kind:'circle',   color:'#E00000' },
 };
 
-/* ============ State ============ */
+const TEXT_COLOR = '#FFC000';
+
 let imageFiles = [];
 let currentIndex = -1;
 let currentId = null;
@@ -260,33 +256,29 @@ let selectedNode = null;
 let currentShape = null;
 let isDirty = false;
 const EMPTY_JSON = '{"className":"Layer","attrs":{},"children":[]}';
-
 function setDirty(){ isDirty = true; }
 
-/* ============ Stage ============ */
 let STAGE_W = 800, STAGE_H = 600;
-const stage = new Konva.Stage({ container:'stage', width:STAGE_W, height:STAGE_H });
-const bgLayer = new Konva.Layer({ listening:false });
-const drawLayer = new Konva.Layer();
+const stage = new Konva.Stage({ container:'stage', width:STAGE_W, height:STAGE_H, listening:true, hitGraphEnabled:true, perfectDrawEnabled:false });
+const bgLayer = new Konva.Layer({ listening:false, hitGraphEnabled:false });
+const drawLayer = new Konva.Layer({ listening:true });
 stage.add(bgLayer); stage.add(drawLayer);
 
-const bgImageNode = new Konva.Image({ listening:false, draggable:false, perfectDrawEnabled:false });
+const bgImageNode = new Konva.Image({ listening:false, draggable:false, perfectDrawEnabled:false, shadowForStrokeEnabled:false });
 bgLayer.add(bgImageNode);
 
 const transformer = new Konva.Transformer({
   rotateEnabled:true,
   rotationSnaps:[0,45,90,135,180,225,270,315],
   enabledAnchors:['top-left','top-right','bottom-left','bottom-right','rotater'],
-  padding:6, borderStroke:'#0B4EA2', borderStrokeWidth:1.5,
-  anchorSize:22, anchorCornerRadius:12,
+  padding:4, borderStroke:'#0B4EA2', borderStrokeWidth:1.5,
+  anchorSize:18, anchorCornerRadius:10,
   anchorStroke:'#0B4EA2', anchorFill:'#fff',
-  rotateAnchorOffset:56,
-  ignoreStroke:true,
+  rotateAnchorOffset:48, ignoreStroke:true, shouldOverdrawWholeArea:false,
   boundBoxFunc:(oldBox, newBox) => newBox.width < 20 || newBox.height < 20 ? oldBox : newBox,
 });
 drawLayer.add(transformer);
 
-/* ============ Sizing ============ */
 function sizeToWrapper(){
   const wrap = document.getElementById('canvas-wrapper');
   if(!wrap) return;
@@ -302,20 +294,18 @@ function resizeStage(w,h){
   stage.container().style.height = h+'px';
 }
 
-/* ============ Selection ============ */
 function selectNode(n){
   selectedNode = n;
   transformer.nodes(n ? [n] : []);
   transformer.visible(!!n);
   transformer.moveToTop();
-  drawLayer.draw();
+  drawLayer.batchDraw();
   updateZButtons();
 }
 function refreshDraggables(){
   const drag = (currentTool === 'select');
   drawLayer.getChildren(n => n !== transformer).forEach(n => n.draggable(drag));
 }
-
 function enableSelect(node){
   node.on('pointerdown', () => { if(currentTool === 'select') selectNode(node); });
   node.on('dragmove transform', setDirty);
@@ -325,11 +315,9 @@ function enableSelect(node){
   });
 }
 
-/* ============ Snap ============ */
 const snapToggle = document.getElementById('snapToggle');
 let snapEnabled = snapToggle.checked;
 snapToggle.addEventListener('change', () => snapEnabled = snapToggle.checked);
-
 function nearestSnapPoint(p, thr){
   thr = thr || 16;
   if(!snapEnabled) return null;
@@ -353,14 +341,10 @@ function nearestSnapPoint(p, thr){
   return best;
 }
 
-/* ============ Pointer helpers ============ */
 const penOnlyToggle = document.getElementById('penOnlyToggle');
 function isPenOnly(){ return penOnlyToggle.checked; }
-function isPenEvent(e){ return ((e.evt||{}).pointerType) === 'pen'; }
-
 const penIndicator = document.getElementById('penIndicator');
 function setPenIndicator(text, active){
-  if(!penIndicator) return;
   penIndicator.innerHTML = '<span class="pen-dot"></span>' + text;
   penIndicator.classList.toggle('active', !!active);
 }
@@ -369,11 +353,11 @@ window.addEventListener('pointerdown', e => {
   else if(e.pointerType === 'touch') setPenIndicator('Vinger', false);
 }, true);
 
-/* ============ Wrapper behavior per tool ============ */
 function updateWrapperMode(){
   const wrap = document.getElementById('canvas-wrapper');
   if(!wrap) return;
-  if(currentTool === 'select' && !pendingSymbol){
+  const active = (currentTool === 'select' && !pendingSymbol);
+  if(active){
     wrap.classList.remove('drawing');
     wrap.style.touchAction = 'pan-x pan-y';
     wrap.style.overflow = 'auto';
@@ -384,24 +368,38 @@ function updateWrapperMode(){
   }
 }
 
-/* ============ Drawing (straight lines only) ============ */
 function beginShape(pos){
   const t = LINE_TYPES[currentLineType];
   const dashed = t.dash || [];
   if(currentTool === 'line'){
-    const w = t.width;
     currentShape = new Konva.Line({
       points:[pos.x, pos.y, pos.x, pos.y],
-      stroke:t.color, strokeWidth:w,
+      stroke:t.color, strokeWidth:t.width,
       dash:dashed, lineCap:'round', lineJoin:'round',
-      hitStrokeWidth:24, perfectDrawEnabled:false, shadowForStrokeEnabled:false,
+      hitStrokeWidth:20, perfectDrawEnabled:false, shadowForStrokeEnabled:false,
+      listening:true,
+    });
+    drawLayer.add(currentShape);
+    enableSelect(currentShape);
+  } else if(currentTool === 'arrow'){
+    currentShape = new Konva.Arrow({
+      points:[pos.x, pos.y, pos.x, pos.y],
+      stroke:t.color, fill:t.color, strokeWidth:t.width,
+      dash:dashed,
+      pointerLength:Math.max(14, t.width * 2),
+      pointerWidth:Math.max(14, t.width * 2),
+      pointerAtBeginning:false,
+      lineCap:'round', lineJoin:'round',
+      hitStrokeWidth:20, perfectDrawEnabled:false, shadowForStrokeEnabled:false,
+      listening:true,
     });
     drawLayer.add(currentShape);
     enableSelect(currentShape);
   } else if(currentTool === 'text'){
     const t2 = new Konva.Text({
       x:pos.x, y:pos.y, text:'Tekst',
-      fontSize:20, fill:'#000', draggable:true, padding:4,
+      fontSize:22, fill:TEXT_COLOR, fontStyle:'bold',
+      draggable:true, padding:4, perfectDrawEnabled:false,
     });
     t2.on('dblclick dbltap', () => {
       const val = prompt('Wijzig tekst', t2.text());
@@ -411,10 +409,8 @@ function beginShape(pos){
     drawLayer.add(t2); enableSelect(t2); selectNode(t2);
     setTool('select');
     commitHistory(); saveScene();
-    return;
   }
 }
-
 function updateShape(pos){
   if(!currentShape) return;
   if(currentShape.className === 'Line' || currentShape.className === 'Arrow'){
@@ -423,7 +419,6 @@ function updateShape(pos){
     currentShape.points(pts);
   }
 }
-
 function finalizeShape(){
   if(!currentShape) return;
   if(currentShape.className === 'Line' || currentShape.className === 'Arrow'){
@@ -440,27 +435,34 @@ function finalizeShape(){
   commitHistory(); saveScene(); isDirty = false;
 }
 
+let rafPending = false, pendingPos = null;
+function scheduleUpdate(){
+  if(rafPending) return;
+  rafPending = true;
+  requestAnimationFrame(() => {
+    rafPending = false;
+    if(pendingPos && currentShape){ updateShape(pendingPos); drawLayer.batchDraw(); }
+    pendingPos = null;
+  });
+}
+
 stage.on('pointerdown', e => {
   const evt = e.evt || {};
   const type = evt.pointerType || 'mouse';
-  const isPen = type === 'pen';
   if(isPenOnly() && type === 'touch'){
     if(e.target === stage || e.target.getLayer() === bgLayer) selectNode(null);
     return;
   }
   if(e.target === stage || e.target.getLayer() === bgLayer) selectNode(null);
 
-  // Symbol placement mode
   if(pendingSymbol){
     const pos = stage.getPointerPosition();
     if(!pos) return;
     placeSymbol(pendingSymbol, pos.x, pos.y);
     return;
   }
-
-  // Shape creation only on empty canvas
   if(e.target !== stage && e.target.getLayer() !== bgLayer) return;
-  if(currentTool !== 'line' && currentTool !== 'text') return;
+  if(currentTool !== 'line' && currentTool !== 'arrow' && currentTool !== 'text') return;
 
   let pos = stage.getPointerPosition();
   if(!pos) return;
@@ -470,27 +472,24 @@ stage.on('pointerdown', e => {
   updateWrapperMode();
 });
 
-stage.on('pointermove', e => {
+stage.on('pointermove', () => {
   if(!currentShape) return;
   let pos = stage.getPointerPosition();
   if(!pos) return;
   const s = nearestSnapPoint(pos, 18);
   if(s) pos = s;
-  updateShape(pos);
-  drawLayer.batchDraw();
+  pendingPos = pos;
+  scheduleUpdate();
 });
 
 function endPointer(){
   finalizeShape();
   updateWrapperMode();
 }
-
-// Robust: listen on window so drawing ends even if pointer leaves stage
 window.addEventListener('pointerup', endPointer);
 window.addEventListener('pointercancel', endPointer);
 
-/* ============ Tools ============ */
-const toolBtnMap = { select:'tool-select', line:'tool-line', text:'tool-text' };
+const toolBtnMap = { select:'tool-select', line:'tool-line', arrow:'tool-arrow', text:'tool-text' };
 function setTool(t){
   flushAndSave();
   currentTool = t;
@@ -500,7 +499,11 @@ function setTool(t){
   });
   const active = document.getElementById(toolBtnMap[t]);
   if(active) active.classList.add('active');
-  if(t !== 'symbol'){ pendingSymbol = null; document.getElementById('modeIndicator').classList.add('hidden'); }
+  if(t !== 'symbol'){
+    pendingSymbol = null;
+    document.getElementById('modeIndicator').classList.add('hidden');
+    document.querySelectorAll('.sym-btn').forEach(b => b.classList.remove('active'));
+  }
   refreshDraggables();
   updateWrapperMode();
 }
@@ -510,31 +513,65 @@ Object.keys(toolBtnMap).forEach(t => {
 });
 setTool('select');
 
-/* ============ Symbols ============ */
+(function buildLineTypes(){
+  const row = document.getElementById('linetype-row');
+  Object.keys(LINE_TYPES).forEach(key => {
+    const def = LINE_TYPES[key];
+    const b = document.createElement('button');
+    b.className = 'ltype-btn' + (key === currentLineType ? ' active' : '');
+    b.dataset.type = key;
+    const swatchClass = 'swatch' + (def.dash ? ' dashed ' + (def.dashedClass||'') : '');
+    const styleAttr = def.dash ? 'color:'+def.color : 'background:'+def.color;
+    b.innerHTML = '<span class="'+swatchClass+'" style="'+styleAttr+'"></span><span class="lbl">'+def.label+'</span>';
+    b.addEventListener('click', () => {
+      currentLineType = key;
+      document.querySelectorAll('.ltype-btn').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+    });
+    row.appendChild(b);
+  });
+})();
+
+function symbolSVG(kind, color){
+  const s = 30;
+  if(kind === 'triangle') return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 30 30"><polygon points="15,3 28,27 2,27" fill="'+color+'" stroke="#000" stroke-width="1.5"/></svg>';
+  if(kind === 'diamond')  return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 30 30"><polygon points="15,2 28,15 15,28 2,15" fill="'+color+'" stroke="#000" stroke-width="1.5"/></svg>';
+  if(kind === 'square')   return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 30 30"><rect x="3" y="3" width="24" height="24" fill="'+color+'" stroke="#000" stroke-width="1.5"/></svg>';
+  if(kind === 'circle')   return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 30 30"><circle cx="15" cy="15" r="12" fill="'+color+'" stroke="#000" stroke-width="1.5"/></svg>';
+  return '';
+}
+
+(function buildSymbolBar(){
+  const bar = document.getElementById('symbol-bar');
+  Object.keys(SYMBOLS).forEach(key => {
+    const def = SYMBOLS[key];
+    const b = document.createElement('button');
+    b.className = 'sym-btn';
+    b.dataset.sym = key;
+    b.innerHTML = symbolSVG(def.kind, def.color) + '<span class="lbl">'+def.label+'</span>';
+    b.addEventListener('click', () => {
+      pendingSymbol = key;
+      document.querySelectorAll('.sym-btn').forEach(s => s.classList.remove('active'));
+      b.classList.add('active');
+      currentTool = 'symbol';
+      Object.values(toolBtnMap).forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.classList.remove('active');
+      });
+      document.getElementById('modeIndicator').classList.remove('hidden');
+      document.getElementById('modeIndicator').textContent = def.label;
+      refreshDraggables();
+      updateWrapperMode();
+    });
+    bar.appendChild(b);
+  });
+})();
+
 function makeSymbolShape(kind, color){
-  if(kind === 'triangle'){
-    return new Konva.RegularPolygon({
-      sides:3, radius:22, fill:color, stroke:'#000', strokeWidth:1.5,
-      rotation:0,
-    });
-  }
-  if(kind === 'diamond'){
-    return new Konva.RegularPolygon({
-      sides:4, radius:22, fill:color, stroke:'#000', strokeWidth:1.5,
-      rotation:0,
-    });
-  }
-  if(kind === 'square'){
-    return new Konva.Rect({
-      x:-20, y:-20, width:40, height:40,
-      fill:color, stroke:'#000', strokeWidth:1.5,
-    });
-  }
-  if(kind === 'circle'){
-    return new Konva.Circle({
-      radius:16, fill:color, stroke:'#000', strokeWidth:1.5,
-    });
-  }
+  if(kind === 'triangle') return new Konva.RegularPolygon({ sides:3, radius:22, fill:color, stroke:'#000', strokeWidth:1.5, perfectDrawEnabled:false });
+  if(kind === 'diamond')  return new Konva.RegularPolygon({ sides:4, radius:22, fill:color, stroke:'#000', strokeWidth:1.5, perfectDrawEnabled:false });
+  if(kind === 'square')   return new Konva.Rect({ x:-20, y:-20, width:40, height:40, fill:color, stroke:'#000', strokeWidth:1.5, perfectDrawEnabled:false });
+  if(kind === 'circle')   return new Konva.Circle({ radius:16, fill:color, stroke:'#000', strokeWidth:1.5, perfectDrawEnabled:false });
   return new Konva.Circle({ radius:16, fill:color });
 }
 
@@ -546,70 +583,12 @@ function placeSymbol(key, x, y){
   drawLayer.add(g);
   enableSelect(g);
   selectNode(g);
-  drawLayer.draw();
+  drawLayer.batchDraw();
   commitHistory(); saveScene(); isDirty = false;
+  setTool('select');
+  document.querySelectorAll('.sym-btn').forEach(b => b.classList.remove('active'));
 }
 
-/* Build symbol palette */
-(function buildSymbols(){
-  const grid = document.getElementById('symbols-grid');
-  Object.keys(SYMBOLS).forEach(key => {
-    const def = SYMBOLS[key];
-    const b = document.createElement('button');
-    b.className = 'sym';
-    b.dataset.sym = key;
-    let picHtml = '';
-    const c = def.color;
-    if(def.kind === 'triangle'){
-      picHtml = '<svg width="32" height="30" viewBox="0 0 32 30"><polygon points="16,3 30,27 2,27" fill="'+c+'" stroke="#000" stroke-width="1.5"/></svg>';
-    } else if(def.kind === 'diamond'){
-      picHtml = '<svg width="30" height="30" viewBox="0 0 30 30"><polygon points="15,2 28,15 15,28 2,15" fill="'+c+'" stroke="#000" stroke-width="1.5"/></svg>';
-    } else if(def.kind === 'square'){
-      picHtml = '<svg width="30" height="30" viewBox="0 0 30 30"><rect x="3" y="3" width="24" height="24" fill="'+c+'" stroke="#000" stroke-width="1.5"/></svg>';
-    } else if(def.kind === 'circle'){
-      picHtml = '<svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="12" fill="'+c+'" stroke="#000" stroke-width="1.5"/></svg>';
-    }
-    b.innerHTML = '<span class="pic">'+picHtml+'</span><span class="lbl">'+def.label+'</span>';
-    b.addEventListener('click', () => {
-      // enter placement mode
-      pendingSymbol = key;
-      document.querySelectorAll('.sym').forEach(s => s.classList.remove('active'));
-      b.classList.add('active');
-      currentTool = 'symbol';
-      Object.values(toolBtnMap).forEach(id => document.getElementById(id).classList.remove('active'));
-      document.getElementById('modeIndicator').classList.remove('hidden');
-      document.getElementById('modeIndicator').textContent = 'Plaats: ' + def.label;
-      refreshDraggables();
-      updateWrapperMode();
-    });
-    grid.appendChild(b);
-  });
-})();
-
-/* Build line-type palette */
-(function buildLineTypes(){
-  const grid = document.getElementById('linetype-grid');
-  Object.keys(LINE_TYPES).forEach(key => {
-    const def = LINE_TYPES[key];
-    const b = document.createElement('button');
-    b.className = 'linetype';
-    b.dataset.type = key;
-    const dashCss = def.dash ? 'dashed' : 'solid';
-    const borderW = def.width + 'px';
-    b.innerHTML = '<span class="swatch" style="border-top:'+borderW+' '+dashCss+' '+def.color+';"></span><span class="lbl">'+def.label+'</span>';
-    b.addEventListener('click', () => {
-      currentLineType = key;
-      document.querySelectorAll('.linetype').forEach(x => x.classList.remove('active'));
-      b.classList.add('active');
-    });
-    grid.appendChild(b);
-  });
-  // set initial
-  const initial = document.querySelector('.linetype[data-type="'+currentLineType+'"]');
-  if(initial) initial.classList.add('active');
-})();
-
-/* ============ Photos ============ */
 const fileInput = document.getElementById('file-input');
 const btnLoad = document.getElementById('btn-load');
 const btnPrev = document.getElementById('btn-prev');
@@ -646,17 +625,11 @@ async function handleFiles(files){
     if(drawLayer.getChildren(n => n !== transformer).length) clearLayer();
     imageFiles = good;
     currentIndex = 0; currentId = good[0].id;
-    good.forEach(it => {
-      scenes[it.id] = EMPTY_JSON;
-      history[it.id] = { past:[EMPTY_JSON], future:[] };
-    });
+    good.forEach(it => { scenes[it.id] = EMPTY_JSON; history[it.id] = { past:[EMPTY_JSON], future:[] }; });
   } else {
     selectNode(null); flushAndSave();
     imageFiles = imageFiles.concat(good);
-    good.forEach(it => {
-      scenes[it.id] = EMPTY_JSON;
-      history[it.id] = { past:[EMPTY_JSON], future:[] };
-    });
+    good.forEach(it => { scenes[it.id] = EMPTY_JSON; history[it.id] = { past:[EMPTY_JSON], future:[] }; });
   }
   renderThumbs();
   loadImageAt(currentIndex);
@@ -679,11 +652,7 @@ function renderThumbs(){
 }
 
 function fitImageToStage(meta){
-  if(!meta){
-    bgImageNode.image(null); bgLayer.draw();
-    resizeStage(STAGE_W, STAGE_H);
-    return;
-  }
+  if(!meta){ bgImageNode.image(null); bgLayer.batchDraw(); resizeStage(STAGE_W, STAGE_H); return; }
   const img = new Image();
   img.onload = () => {
     sizeToWrapper();
@@ -698,7 +667,7 @@ function fitImageToStage(meta){
     const ix = Math.max(0, (sw - iw) / 2);
     const iy = Math.max(0, (sh - ih) / 2);
     bgImageNode.setAttrs({ image:img, x:ix, y:iy, width:iw, height:ih });
-    bgLayer.draw();
+    bgLayer.batchDraw();
     centerViewportOnBg();
   };
   img.src = meta.dataURL;
@@ -769,7 +738,6 @@ document.getElementById('btn-rename-photo').addEventListener('click', () => {
   renderThumbs();
 });
 
-/* ============ History ============ */
 function snapshot(){
   const layer = transformer.getLayer();
   transformer.remove();
@@ -787,7 +755,7 @@ function applyJSON(json){
     }catch(e){ logErr('JSON', String(e && e.message || e)); }
   }
   drawLayer.add(transformer);
-  drawLayer.draw();
+  drawLayer.batchDraw();
   selectNode(null);
   refreshDraggables();
 }
@@ -796,11 +764,10 @@ function clearLayer(){
   transformer.remove();
   drawLayer.destroyChildren();
   layer.add(transformer);
-  drawLayer.draw();
+  drawLayer.batchDraw();
 }
 function saveScene(){ if(currentId) scenes[currentId] = snapshot(); }
 function flushAndSave(){ if(isDirty){ commitHistory(); saveScene(); isDirty = false; } }
-
 function commitHistory(){
   if(!currentId) return;
   if(!history[currentId]) history[currentId] = { past:[EMPTY_JSON], future:[] };
@@ -809,7 +776,7 @@ function commitHistory(){
   const last = h.past[h.past.length-1];
   if(last !== json){
     h.past.push(json);
-    if(h.past.length > 100) h.past.shift();
+    if(h.past.length > 80) h.past.shift();
     h.future = [];
     scenes[currentId] = json;
   }
@@ -819,21 +786,17 @@ function undo(){
   if(!currentId) return;
   const h = history[currentId];
   if(!h || h.past.length <= 1) return;
-  const cur = h.past.pop();
-  h.future.push(cur);
+  const cur = h.past.pop(); h.future.push(cur);
   const prev = h.past[h.past.length-1];
-  applyJSON(prev);
-  scenes[currentId] = prev;
+  applyJSON(prev); scenes[currentId] = prev;
   updateUndoRedo();
 }
 function redo(){
   if(!currentId) return;
   const h = history[currentId];
   if(!h || !h.future.length) return;
-  const next = h.future.pop();
-  h.past.push(next);
-  applyJSON(next);
-  scenes[currentId] = next;
+  const next = h.future.pop(); h.past.push(next);
+  applyJSON(next); scenes[currentId] = next;
   updateUndoRedo();
 }
 function updateUndoRedo(){
@@ -846,7 +809,6 @@ function updateUndoRedo(){
 document.getElementById('btn-undo').addEventListener('click', undo);
 document.getElementById('btn-redo').addEventListener('click', redo);
 
-/* ============ Z-order & delete ============ */
 const btnUp = document.getElementById('btn-up');
 const btnDown = document.getElementById('btn-down');
 const btnDelete = document.getElementById('btn-delete');
@@ -854,42 +816,25 @@ function updateZButtons(){
   const en = !!selectedNode;
   btnUp.disabled = !en; btnDown.disabled = !en; btnDelete.disabled = !en;
 }
-btnUp.addEventListener('click', () => {
-  if(!selectedNode) return;
-  selectedNode.moveUp(); transformer.moveToTop();
-  drawLayer.draw(); commitHistory(); saveScene();
-});
-btnDown.addEventListener('click', () => {
-  if(!selectedNode) return;
-  selectedNode.moveDown(); transformer.moveToTop();
-  drawLayer.draw(); commitHistory(); saveScene();
-});
-btnDelete.addEventListener('click', () => {
-  if(!selectedNode) return;
-  selectedNode.destroy();
-  selectNode(null);
-  drawLayer.draw();
-  commitHistory(); saveScene();
-});
+btnUp.addEventListener('click', () => { if(!selectedNode) return; selectedNode.moveUp(); transformer.moveToTop(); drawLayer.batchDraw(); commitHistory(); saveScene(); });
+btnDown.addEventListener('click', () => { if(!selectedNode) return; selectedNode.moveDown(); transformer.moveToTop(); drawLayer.batchDraw(); commitHistory(); saveScene(); });
+btnDelete.addEventListener('click', () => { if(!selectedNode) return; selectedNode.destroy(); selectNode(null); drawLayer.batchDraw(); commitHistory(); saveScene(); });
 document.getElementById('btn-clear').addEventListener('click', () => {
   if(!confirm('Alle tekeningen op dit beeld wissen?')) return;
-  clearLayer();
-  commitHistory(); saveScene();
+  clearLayer(); commitHistory(); saveScene();
 });
 
-/* ============ Keyboard ============ */
 window.addEventListener('keydown', e => {
   const tag = (document.activeElement && document.activeElement.tagName) || '';
   if(/INPUT|TEXTAREA/.test(tag)) return;
   if((e.ctrlKey||e.metaKey) && e.key.toLowerCase() === 'z'){ e.preventDefault(); undo(); }
   if((e.ctrlKey||e.metaKey) && e.key.toLowerCase() === 'y'){ e.preventDefault(); redo(); }
   if((e.key === 'Delete' || e.key === 'Backspace') && selectedNode){
-    selectedNode.destroy(); selectNode(null); drawLayer.draw();
+    selectedNode.destroy(); selectNode(null); drawLayer.batchDraw();
     commitHistory(); saveScene();
   }
 });
 
-/* ============ Export ============ */
 function dataURLToBlob(dataURL){
   const commaIndex = dataURL.indexOf(',');
   if(commaIndex === -1) throw new Error('Invalid dataURL');
@@ -928,20 +873,20 @@ async function exportCroppedURL(){
   }
   const rect = bgImageNode.getClientRect({ skipShadow:true, skipStroke:true });
   if(!rect || !rect.width || !rect.height){
-    return stage.toDataURL({ mimeType:'image/png' });
+    return stage.toDataURL({ mimeType:'image/png', pixelRatio:2 });
   }
   const im = bgImageNode.image && bgImageNode.image();
-  const pr = (im && rect.width) ? (im.naturalWidth / rect.width) : 1;
+  const pr = (im && rect.width) ? (im.naturalWidth / rect.width) : 2;
   const prev = transformer.nodes();
   transformer.visible(false); transformer.nodes([]);
   drawLayer.draw();
   await new Promise(r => setTimeout(r, 20));
   const url = stage.toDataURL({
     mimeType:'image/png', x:rect.x, y:rect.y, width:rect.width, height:rect.height,
-    pixelRatio:Math.max(1, pr),
+    pixelRatio:Math.max(2, pr),
   });
   transformer.visible(true); transformer.nodes(prev);
-  drawLayer.draw();
+  drawLayer.batchDraw();
   return url;
 }
 function downloadBlob(name, blob){
@@ -959,77 +904,47 @@ document.getElementById('btn-export').addEventListener('click', async () => {
     const base = (currentIndex >= 0 && imageFiles[currentIndex] && imageFiles[currentIndex].name)
       ? imageFiles[currentIndex].name.replace(/\.[^.]+$/,'') : 'tekening';
     downloadBlob(base + '-annotated.jpg', blob);
-  }catch(e){ logErr('Export JPEG', String(e && e.message || e)); }
+  }catch(e){ logErr('Export', String(e && e.message || e)); }
 });
 
-/* Simple ZIP */
 function SimpleZip(){ this.parts=[]; this.files=[]; this.size=0; }
-function CRC32(){
-  if(!CRC32.table){
-    CRC32.table = new Uint32Array(256);
-    for(let n=0;n<256;n++){ let c=n; for(let k=0;k<8;k++) c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1); CRC32.table[n]=c>>>0; }
-  }
-  this.crc = ~0;
-}
-CRC32.prototype.update = function(arr){
-  const t = CRC32.table; let c = this.crc;
-  for(let i=0;i<arr.length;i++) c = t[(c^arr[i])&255]^(c>>>8);
-  this.crc = c;
-};
+function CRC32(){ if(!CRC32.table){ CRC32.table = new Uint32Array(256); for(let n=0;n<256;n++){ let c=n; for(let k=0;k<8;k++) c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1); CRC32.table[n]=c>>>0; } } this.crc = ~0; }
+CRC32.prototype.update = function(arr){ const t = CRC32.table; let c = this.crc; for(let i=0;i<arr.length;i++) c = t[(c^arr[i])&255]^(c>>>8); this.crc = c; };
 CRC32.prototype.digest = function(){ return (~this.crc)>>>0; };
 function le16(v){ return new Uint8Array([v&255,(v>>>8)&255]); }
 function le32(v){ return new Uint8Array([v&255,(v>>>8)&255,(v>>>16)&255,(v>>>24)&255]); }
-function dosTime(dt){
-  dt = dt || new Date();
-  const time = (dt.getHours()<<11)|(dt.getMinutes()<<5)|(Math.floor(dt.getSeconds()/2));
-  const date = ((dt.getFullYear()-1980)<<9)|((dt.getMonth()+1)<<5)|dt.getDate();
-  return { time, date };
-}
+function dosTime(dt){ dt = dt||new Date(); return { time:(dt.getHours()<<11)|(dt.getMinutes()<<5)|(Math.floor(dt.getSeconds()/2)), date:((dt.getFullYear()-1980)<<9)|((dt.getMonth()+1)<<5)|dt.getDate() }; }
 SimpleZip.prototype.add = function(name, bytes, mtime){
   if(!(bytes instanceof Uint8Array)) bytes = new Uint8Array(bytes);
-  const enc = new TextEncoder();
-  const nb = enc.encode(name);
-  const ts = dosTime(mtime);
-  const c = new CRC32(); c.update(bytes);
-  const crc = c.digest()>>>0;
-  const local = [le32(0x04034b50), le16(20), le16(0), le16(0), le16(ts.time), le16(ts.date),
-    le32(crc), le32(bytes.length), le32(bytes.length), le16(nb.length), le16(0), nb];
+  const enc = new TextEncoder(); const nb = enc.encode(name); const ts = dosTime(mtime);
+  const c = new CRC32(); c.update(bytes); const crc = c.digest()>>>0;
+  const local = [le32(0x04034b50), le16(20), le16(0), le16(0), le16(ts.time), le16(ts.date), le32(crc), le32(bytes.length), le32(bytes.length), le16(nb.length), le16(0), nb];
   let L=0; for(const p of local) L+=p.length;
-  const lh = new Uint8Array(L);
-  let o=0; for(const p of local){ lh.set(p,o); o+=p.length; }
+  const lh = new Uint8Array(L); let o=0; for(const p of local){ lh.set(p,o); o+=p.length; }
   this.parts.push(lh, bytes);
-  const off = this.size;
-  this.size += lh.length + bytes.length;
+  const off = this.size; this.size += lh.length + bytes.length;
   this.files.push({ nb, ts, crc, size:bytes.length, off });
 };
 SimpleZip.prototype.render = function(){
   const central = []; let centralSize = 0;
   for(const f of this.files){
-    const cd = [le32(0x02014b50), le16(20), le16(20), le16(0), le16(0),
-      le16(f.ts.time), le16(f.ts.date), le32(f.crc), le32(f.size), le32(f.size),
-      le16(f.nb.length), le16(0), le16(0), le16(0), le16(0), le32(0), le32(f.off), f.nb];
+    const cd = [le32(0x02014b50), le16(20), le16(20), le16(0), le16(0), le16(f.ts.time), le16(f.ts.date), le32(f.crc), le32(f.size), le32(f.size), le16(f.nb.length), le16(0), le16(0), le16(0), le16(0), le32(0), le32(f.off), f.nb];
     let L=0; for(const p of cd) L+=p.length;
-    const buf = new Uint8Array(L);
-    let o=0; for(const p of cd){ buf.set(p,o); o+=p.length; }
+    const buf = new Uint8Array(L); let o=0; for(const p of cd){ buf.set(p,o); o+=p.length; }
     central.push(buf); centralSize += L;
   }
-  const eocd = new Uint8Array(22);
-  let o=0;
+  const eocd = new Uint8Array(22); let o=0;
   eocd.set(le32(0x06054b50), o); o+=4;
-  eocd.set(le16(0), o); o+=2;
-  eocd.set(le16(0), o); o+=2;
-  eocd.set(le16(this.files.length), o); o+=2;
-  eocd.set(le16(this.files.length), o); o+=2;
-  eocd.set(le32(centralSize), o); o+=4;
-  eocd.set(le32(this.size), o); o+=4;
+  eocd.set(le16(0), o); o+=2; eocd.set(le16(0), o); o+=2;
+  eocd.set(le16(this.files.length), o); o+=2; eocd.set(le16(this.files.length), o); o+=2;
+  eocd.set(le32(centralSize), o); o+=4; eocd.set(le32(this.size), o); o+=4;
   eocd.set(le16(0), o); o+=2;
   const all = [...this.parts, ...central, eocd];
   let sum=0; for(const p of all) sum+=p.length;
-  const out = new Uint8Array(sum);
-  let pos=0; for(const p of all){ out.set(p,pos); pos+=p.length; }
+  const out = new Uint8Array(sum); let pos=0;
+  for(const p of all){ out.set(p,pos); pos+=p.length; }
   return new Blob([out], { type:'application/zip' });
 };
-
 document.getElementById('btn-export-all').addEventListener('click', async () => {
   if(!imageFiles.length) return;
   const zip = new SimpleZip();
@@ -1048,7 +963,7 @@ document.getElementById('btn-export-all').addEventListener('click', async () => 
       const arr = new Uint8Array(await blob.arrayBuffer());
       const base = (imageFiles[i].name || ('beeld-'+(i+1))).replace(/\.[^.]+$/,'');
       zip.add(base + '.jpg', arr, new Date());
-    }catch(e){ logErr('ZIP item '+i, String(e && e.message || e)); }
+    }catch(e){ logErr('ZIP '+i, String(e && e.message || e)); }
   }
   if(includeJson){
     flushAndSave();
@@ -1062,7 +977,6 @@ document.getElementById('btn-export-all').addEventListener('click', async () => 
   if(prevIndex >= 0) loadImageAt(prevIndex);
 });
 
-/* ============ Project ============ */
 document.getElementById('btn-export-project').addEventListener('click', () => {
   try{
     flushAndSave();
@@ -1072,7 +986,7 @@ document.getElementById('btn-export-project').addEventListener('click', () => {
     const base = (document.getElementById('projectName').value || 'project')
       .replace(/[\\/:*?"<>|]+/g,'_').replace(/\s+/g,' ').trim() || 'project';
     downloadBlob(base + '.json', new Blob([JSON.stringify(data, null, 2)], { type:'application/json' }));
-  }catch(e){ logErr('Project opslaan', String(e && e.message || e)); }
+  }catch(e){ logErr('Opslaan', String(e && e.message || e)); }
 });
 const projInput = document.getElementById('project-input');
 document.getElementById('btn-load-project').addEventListener('click', () => projInput.click());
@@ -1081,11 +995,10 @@ projInput.addEventListener('change', async e => {
     const file = (e.target.files||[])[0];
     if(!file) return;
     const data = JSON.parse(await file.text());
-    if(!data || !Array.isArray(data.images)){ logErr('Project','Geen geldige JSON'); e.target.value=''; return; }
+    if(!data || !Array.isArray(data.images)){ logErr('Project','Ongeldig'); e.target.value=''; return; }
     selectNode(null); clearLayer();
     const imgs = data.images.map((it, i) => ({
-      id: it.id || newId(),
-      name: it.name || ('beeld-'+(i+1)+'.png'),
+      id: it.id || newId(), name: it.name || ('beeld-'+(i+1)+'.png'),
       dataURL: it.dataURL || '', w: it.w || 0, h: it.h || 0,
     }));
     imageFiles = imgs;
@@ -1101,14 +1014,13 @@ projInput.addEventListener('change', async e => {
     if(imgs.length) loadImageAt(0);
     else { fitImageToStage(null); curName.textContent = '–'; updateUndoRedo(); }
     e.target.value = '';
-    logErr('OK', 'Project geladen (' + imgs.length + ' beelden)');
+    logErr('OK', 'Project geladen');
   }catch(err){
-    logErr('Project laden', String(err && err.message || err));
+    logErr('Laden', String(err && err.message || err));
     try{ e.target.value = ''; }catch(_){}
   }
 });
 
-/* ============ Drawers ============ */
 const body = document.body;
 function openDrawer(side){
   body.classList.remove('drawer-left','drawer-right');
@@ -1124,7 +1036,6 @@ document.getElementById('toggle-right').addEventListener('click', () => {
 document.querySelectorAll('.close-x').forEach(b => b.addEventListener('click', closeDrawers));
 document.getElementById('backdrop').addEventListener('click', closeDrawers);
 
-/* ============ Resize ============ */
 function handleResize(){
   const meta = imageFiles[currentIndex];
   sizeToWrapper();
@@ -1143,7 +1054,6 @@ if(window.ResizeObserver){
 requestAnimationFrame(() => sizeToWrapper());
 window.addEventListener('load', () => setTimeout(sizeToWrapper, 100));
 
-/* Prevent iOS gestures */
 document.addEventListener('gesturestart', e => e.preventDefault());
 let lastTouchEnd = 0;
 document.addEventListener('touchend', e => {
@@ -1152,7 +1062,7 @@ document.addEventListener('touchend', e => {
   lastTouchEnd = now;
 }, { passive:false });
 
-console.log('Tekenapp Fiber gereed');
+console.log('Tekenapp Fiber v5');
 })();
 </script>
 </body>
