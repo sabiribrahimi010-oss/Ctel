@@ -27,14 +27,14 @@ button{touch-action:manipulation;user-select:none;-webkit-user-select:none;font-
 
 .ltype-btn{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:64px;height:40px;padding:0 8px;border:2px solid var(--line);background:#fff;border-radius:8px;cursor:pointer;flex-shrink:0}
 .ltype-btn.active{border-color:var(--accent);background:#EAF2FB}
-.ltype-btn .swatch{width:52px;height:4px;border-radius:2px;flex-shrink:0}
-.ltype-btn .swatch.thin{height:2px}
-.ltype-btn .swatch.dashed{height:5px}
+.ltype-btn .swatch{width:52px;height:4px;border-radius:0;flex-shrink:0}
+.ltype-btn .swatch.thin{height:3px}
+.ltype-btn .swatch.dashed{height:4px}
 .ltype-btn .swatch.dashed.thin{height:3px}
 .ltype-btn .swatch.dashed.black{background-image:repeating-linear-gradient(90deg,#000 0 8px,transparent 8px 14px)}
 .ltype-btn .swatch.dashed.brown{background-image:repeating-linear-gradient(90deg,#A0522D 0 8px,transparent 8px 14px)}
 .ltype-btn .swatch.dashed.green{background-image:repeating-linear-gradient(90deg,#00B050 0 8px,transparent 8px 14px)}
-.ltype-btn .swatch.dashed.orange{background-image:repeating-linear-gradient(90deg,#FFC000 0 5px,transparent 5px 9px)}
+.ltype-btn .swatch.dashed.orange{background-image:repeating-linear-gradient(90deg,#FFC000 0 6px,transparent 6px 11px)}
 .ltype-btn .lbl{font-size:8px;color:#555;line-height:1;letter-spacing:.2px}
 
 #main{flex:1;min-height:0;display:grid;grid-template-columns:82px 1fr;overflow:hidden}
@@ -191,6 +191,7 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--brand)}
       <button id="btn-export" class="btn">Export JPEG</button>
       <button id="btn-export-all" class="btn">Export alles (ZIP)</button>
     </div>
+    <div class="hint" id="dirHint" style="display:none">Op dit toestel kun je een map kiezen als bestemming.</div>
     <label class="check"><input type="checkbox" id="includeProjectJson"> Project.json meesturen</label>
     <hr class="sep">
     <div class="row"><strong>Project</strong></div>
@@ -252,14 +253,17 @@ if(typeof Konva === 'undefined'){
   return;
 }
 
+/* ==================== LIJNTYPES ====================
+   Diktes zoals eerder goed bevonden. Butt-cap + miter-join
+   voor strakke, technische lijnen (geen cartoon-effect). */
 const LINE_TYPES = {
-  publiek:   { label:'PUBLIEK',   color:'#000000', width:8,  dash:[16,12], dashedClass:'black',  pointerLen:18 },
-  prive:     { label:'PRIVÉ',     color:'#A0522D', width:6,  dash:[16,12], dashedClass:'brown',  pointerLen:14 },
-  gevel:     { label:'GEVEL',     color:'#7030A0', width:6,  dash:null,                          pointerLen:14 },
-  gem_zicht: { label:'GEM ZIEN',  color:'#00B050', width:6,  dash:null,                          pointerLen:14 },
-  gem_niet:  { label:'GEM NIET',  color:'#00B050', width:6,  dash:[14,10], dashedClass:'green',  pointerLen:14 },
-  ind_zicht: { label:'IND ZIEN',  color:'#FFC000', width:3,  dash:null,                          pointerLen:7  },
-  ind_niet:  { label:'IND NIET',  color:'#FFC000', width:3,  dash:[10,7],  dashedClass:'orange', pointerLen:7  },
+  publiek:   { label:'PUBLIEK',   color:'#000000', width:8, dash:[16,12], dashedClass:'black',  pointerLen:18 },
+  prive:     { label:'PRIVÉ',     color:'#A0522D', width:6, dash:[16,12], dashedClass:'brown',  pointerLen:14 },
+  gevel:     { label:'GEVEL',     color:'#7030A0', width:6, dash:null,                          pointerLen:14 },
+  gem_zicht: { label:'GEM ZIEN',  color:'#00B050', width:6, dash:null,                          pointerLen:14 },
+  gem_niet:  { label:'GEM NIET',  color:'#00B050', width:6, dash:[14,10], dashedClass:'green',  pointerLen:14 },
+  ind_zicht: { label:'IND ZIEN',  color:'#FFC000', width:3, dash:null,                          pointerLen:7  },
+  ind_niet:  { label:'IND NIET',  color:'#FFC000', width:3, dash:[10,7],  dashedClass:'orange', pointerLen:7  },
 };
 const SYMBOLS = {
   intrede_onder: { label:'Ondergronds', kind:'triangle', color:'#1E88E5' },
@@ -406,8 +410,11 @@ function beginShape(pos){
     currentShape = new Konva.Line({
       points:[pos.x, pos.y, pos.x, pos.y],
       stroke:t.color, strokeWidth:t.width,
-      dash:dashed, lineCap:'round', lineJoin:'round',
-      hitStrokeWidth:20, perfectDrawEnabled:false, shadowForStrokeEnabled:false,
+      dash:dashed,
+      lineCap:'butt', lineJoin:'miter',   /* rechte uiteinden/hoeken */
+      hitStrokeWidth:20,
+      perfectDrawEnabled:false,
+      shadowForStrokeEnabled:false,
       listening:true,
     });
     drawLayer.add(currentShape);
@@ -417,11 +424,13 @@ function beginShape(pos){
       points:[pos.x, pos.y, pos.x, pos.y],
       stroke:t.color, fill:t.color, strokeWidth:t.width,
       dash:dashed,
-      pointerLength:(t.pointerLen || Math.max(14, t.width * 2)),
-      pointerWidth:(t.pointerLen || Math.max(14, t.width * 2)),
+      pointerLength:(t.pointerLen || 14),
+      pointerWidth:(t.pointerLen || 14),
       pointerAtBeginning:false,
-      lineCap:'round', lineJoin:'round',
-      hitStrokeWidth:20, perfectDrawEnabled:false, shadowForStrokeEnabled:false,
+      lineCap:'butt', lineJoin:'miter',
+      hitStrokeWidth:20,
+      perfectDrawEnabled:false,
+      shadowForStrokeEnabled:false,
       listening:true,
     });
     drawLayer.add(currentShape);
@@ -561,7 +570,7 @@ setTool('select');
     const b = document.createElement('button');
     b.className = 'ltype-btn' + (key === currentLineType ? ' active' : '');
     b.dataset.type = key;
-    const isThin = def.width <= 4;
+    const isThin = def.width <= 3;
     const swatchClass = 'swatch' + (isThin ? ' thin' : '') + (def.dash ? ' dashed ' + (def.dashedClass||'') : '');
     const styleAttr = def.dash ? 'color:'+def.color : 'background:'+def.color;
     b.innerHTML = '<span class="'+swatchClass+'" style="'+styleAttr+'"></span><span class="lbl">'+def.label+'</span>';
@@ -634,7 +643,6 @@ const fileInput = document.getElementById('file-input');
 const thumbsEl = document.getElementById('thumbs');
 const curName = document.getElementById('current-name');
 
-/* ============ Foto's toevoegen ============ */
 document.getElementById('bb-add').addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', async e => {
   const files = [...(e.target.files||[])];
@@ -646,7 +654,6 @@ function newId(){ return 'img-' + Date.now().toString(36) + '-' + Math.random().
 
 async function handleFiles(files){
   if(!files || !files.length) return;
-  // Sorteer op bestandsnaam numeriek (1, 2, 3, ..., 10, 11)
   files.sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { numeric: true, sensitivity: 'base' }));
 
   const items = await Promise.all(files.map(f => new Promise(res => {
@@ -672,7 +679,6 @@ async function handleFiles(files){
   } else {
     selectNode(null); flushAndSave();
     imageFiles = imageFiles.concat(good);
-    // her-sorteer de hele lijst op naam
     imageFiles.sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { numeric: true, sensitivity: 'base' }));
     good.forEach(it => { scenes[it.id] = EMPTY_JSON; history[it.id] = { past:[EMPTY_JSON], future:[] }; });
     currentIndex = imageFiles.findIndex(f => f.id === currentId);
@@ -813,7 +819,6 @@ document.getElementById('bb-delete').addEventListener('click', () => {
   document.getElementById('btn-remove-photo').click();
 });
 
-/* ============ Snapshot = array van node-JSONs (robuuster) ============ */
 let lastCommitJson = '';
 let lastCommitTime = 0;
 
@@ -821,7 +826,7 @@ function snapshot(){
   const children = layerChildrenNoTransformer();
   const arr = [];
   for(let i = 0; i < children.length; i++){
-    try{ arr.push(children[i].toJSON()); }catch(e){ /* skip kapotte node */ }
+    try{ arr.push(children[i].toJSON()); }catch(e){}
   }
   return JSON.stringify(arr);
 }
@@ -835,7 +840,6 @@ function applyJSON(jsonStr){
       if(Array.isArray(parsed)){
         arr = parsed;
       } else if(parsed && parsed.className === 'Layer' && Array.isArray(parsed.children)){
-        // oud formaat → converteer
         arr = parsed.children;
       }
       for(let i = 0; i < arr.length; i++){
@@ -1052,12 +1056,33 @@ SimpleZip.prototype.render = function(){
   for(const p of all){ out.set(p,pos); pos+=p.length; }
   return new Blob([out], { type:'application/zip' });
 };
+
+async function saveBlobToDir(dirHandle, filename, blob){
+  const fh = await dirHandle.getFileHandle(filename, { create:true });
+  const w = await fh.createWritable();
+  await w.write(blob);
+  await w.close();
+}
+
 document.getElementById('btn-export-all').addEventListener('click', async () => {
   if(!imageFiles.length) return;
-  const zip = new SimpleZip();
+
+  let dirHandle = null;
+  const canPickDir = !!window.showDirectoryPicker;
+  if(canPickDir){
+    try{
+      dirHandle = await window.showDirectoryPicker({ id:'fiber-export', mode:'readwrite' });
+    }catch(e){
+      if(e && e.name === 'AbortError') return;
+      dirHandle = null;
+      logErr('Map', 'Kon geen map openen, val terug op ZIP');
+    }
+  }
+
   const prevIndex = currentIndex;
   const includeJson = document.getElementById('includeProjectJson').checked;
-  // imageFiles is al gesorteerd op naam, dus ZIP volgt dezelfde volgorde
+  const outFiles = [];
+
   for(let i=0; i<imageFiles.length; i++){
     if(currentIndex !== i){
       if(currentIndex >= 0){ selectNode(null); flushAndSave(); }
@@ -1068,20 +1093,53 @@ document.getElementById('btn-export-all').addEventListener('click', async () => 
     try{
       const url = await exportCroppedURL();
       const blob = await compressToJpeg(url, 500);
-      const arr = new Uint8Array(await blob.arrayBuffer());
       const base = (imageFiles[i].name || ('beeld-'+(i+1))).replace(/\.[^.]+$/,'');
-      zip.add(base + '.jpg', arr, new Date());
-    }catch(e){ logErr('ZIP '+i, String(e && e.message || e)); }
+      outFiles.push({ name: base + '.jpg', blob: blob });
+    }catch(e){ logErr('Export '+i, String(e && e.message || e)); }
   }
+
+  let jsonBlob = null, jsonName = null;
   if(includeJson){
     flushAndSave();
     const imgs = imageFiles.map(it => ({ id:it.id, name:it.name, dataURL:it.dataURL, w:it.w, h:it.h }));
     const sc = {}; imgs.forEach(it => { sc[it.id] = scenes[it.id] || EMPTY_JSON; });
     const data = { version:4, projectName:(document.getElementById('projectName').value||'').trim(), images:imgs, scenes:sc };
-    const jsonBlob = new Blob([JSON.stringify(data)], { type:'application/json' });
-    zip.add('project.json', new Uint8Array(await jsonBlob.arrayBuffer()), new Date());
+    jsonBlob = new Blob([JSON.stringify(data)], { type:'application/json' });
+    jsonName = 'project.json';
   }
-  downloadBlob('export.zip', zip.render());
+
+  if(dirHandle){
+    try{
+      for(const f of outFiles){
+        await saveBlobToDir(dirHandle, f.name, f.blob);
+      }
+      if(jsonBlob && jsonName){
+        await saveBlobToDir(dirHandle, jsonName, jsonBlob);
+      }
+      logErr('OK', outFiles.length + ' bestand(en) opgeslagen in gekozen map');
+    }catch(e){
+      logErr('Map opslaan', String(e && e.message || e));
+      const zip = new SimpleZip();
+      for(const f of outFiles){
+        zip.add(f.name, new Uint8Array(await f.blob.arrayBuffer()), new Date());
+      }
+      if(jsonBlob && jsonName){
+        zip.add(jsonName, new Uint8Array(await jsonBlob.arrayBuffer()), new Date());
+      }
+      downloadBlob('export.zip', zip.render());
+    }
+  } else {
+    const zip = new SimpleZip();
+    for(const f of outFiles){
+      zip.add(f.name, new Uint8Array(await f.blob.arrayBuffer()), new Date());
+    }
+    if(jsonBlob && jsonName){
+      zip.add(jsonName, new Uint8Array(await jsonBlob.arrayBuffer()), new Date());
+    }
+    downloadBlob('export.zip', zip.render());
+    logErr('OK', 'ZIP met ' + outFiles.length + ' bestand(en) gedownload');
+  }
+
   if(prevIndex >= 0) loadImageAt(prevIndex);
 });
 
@@ -1145,6 +1203,11 @@ document.getElementById('toggle-right').addEventListener('click', () => {
 document.querySelectorAll('.close-x').forEach(b => b.addEventListener('click', closeDrawers));
 document.getElementById('backdrop').addEventListener('click', closeDrawers);
 
+if(window.showDirectoryPicker){
+  const hint = document.getElementById('dirHint');
+  if(hint) hint.style.display = 'block';
+}
+
 function handleResize(){
   const meta = imageFiles[currentIndex];
   sizeToWrapper();
@@ -1172,7 +1235,7 @@ document.addEventListener('touchend', e => {
 }, { passive:false });
 
 updateBottomBar();
-console.log('Tekenapp Fiber v9');
+console.log('Tekenapp Fiber v11');
 })();
 </script>
 </body>
