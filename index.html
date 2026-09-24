@@ -48,6 +48,10 @@ button{touch-action:manipulation;user-select:none;-webkit-user-select:none;font-
 .sym-btn.active{border-color:var(--accent);background:#EAF2FB}
 .sym-btn svg{display:block}
 .sym-btn .lbl{font-size:8px;color:#444;text-align:center;line-height:1;letter-spacing:.1px;padding:0 1px}
+.sym-sep{height:1px;background:var(--line);margin:4px 2px;flex-shrink:0;grid-column:1/-1}
+.sym-btn.floor-btn{background:#FFFDE7;border-color:#FFE082;min-height:46px}
+.sym-btn.floor-btn.active{background:#FFF3C4;border-color:#B58500}
+.sym-btn.floor-btn svg{width:24px;height:24px}
 
 #canvas-wrapper{overflow:auto;background:#e9ecef;position:relative;-webkit-overflow-scrolling:touch;user-select:none;-webkit-user-select:none;touch-action:pan-x pan-y}
 #canvas-wrapper.drawing{touch-action:none;overflow:hidden}
@@ -59,6 +63,8 @@ button{touch-action:manipulation;user-select:none;-webkit-user-select:none;font-
   .sym-btn{min-height:64px;padding:6px 3px}
   .sym-btn svg{width:36px;height:36px}
   .sym-btn .lbl{font-size:9px}
+  .sym-btn.floor-btn{min-height:50px}
+  .sym-btn.floor-btn svg{width:26px;height:26px}
   .btn{padding:0 14px}
   .ltype-btn{min-width:74px}
   .ltype-btn .swatch{width:60px}
@@ -265,6 +271,7 @@ const LINE_TYPES = {
   ind_zicht: { label:'IND ZIEN',  color:'#FFC000', width:3, dash:null,                          pointerLen:7  },
   ind_niet:  { label:'IND NIET',  color:'#FFC000', width:3, dash:[10,7],  dashedClass:'orange', pointerLen:7  },
 };
+
 const SYMBOLS = {
   intrede_onder: { label:'Ondergronds', kind:'triangle', color:'#1E88E5' },
   intrede_boven: { label:'Bovengronds', kind:'triangle', color:'#7030A0' },
@@ -272,7 +279,20 @@ const SYMBOLS = {
   verdeeldoos:   { label:'Verdeeldoos', kind:'square',   color:'#00B050' },
   ftu:           { label:'FTU',         kind:'square',   color:'#FFC000' },
   boorgat:       { label:'Boorgat',     kind:'circle',   color:'#E00000' },
+  LU:            { label:'LU',          kind:'label',    color:'#FFE600', bg:'#FFE600', fg:'#000', text:'LU', w:48, h:30, fs:15 },
+  BU:            { label:'BU',          kind:'label',    color:'#FFE600', bg:'#FFE600', fg:'#000', text:'BU', w:48, h:30, fs:15 },
 };
+/* Verdiepingen -1 t/m +10 */
+for(let f = -1; f <= 10; f++){
+  SYMBOLS['floor_' + f] = {
+    label: 'Verdieping ' + (f >= 0 ? ('+' + f) : f),
+    shortLabel: (f >= 0 ? ('+' + f) : String(f)),
+    kind: 'floor',
+    color: '#FFC000',
+    floorValue: f,
+  };
+}
+
 const TEXT_COLOR = '#FFC000';
 
 let imageFiles = [];
@@ -581,28 +601,68 @@ setTool('select');
       currentLineType = key;
       document.querySelectorAll('.ltype-btn').forEach(x => x.classList.remove('active'));
       b.classList.add('active');
-      setTool('line');
+      // Gele stippellijn (IND NIET) automatisch op Pijl, rest op Lijn
+      if(key === 'ind_niet') setTool('arrow');
+      else setTool('line');
     });
     row.appendChild(b);
   });
 })();
 
-function symbolSVG(kind, color){
+/* ====== SVG icons voor de linker balk ====== */
+function symbolSVG(def){
+  const kind = def.kind;
+  const color = def.color;
   const s = 30;
-  if(kind === 'triangle') return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 30 30"><polygon points="15,3 28,27 2,27" fill="'+color+'" stroke="#000" stroke-width="1.5"/></svg>';
-  if(kind === 'diamond')  return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 30 30"><polygon points="15,2 28,15 15,28 2,15" fill="'+color+'" stroke="#000" stroke-width="1.5"/></svg>';
-  if(kind === 'square')   return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 30 30"><rect x="3" y="3" width="24" height="24" fill="'+color+'" stroke="#000" stroke-width="1.5"/></svg>';
-  if(kind === 'circle')   return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 30 30"><circle cx="15" cy="15" r="10" fill="'+color+'" stroke="#000" stroke-width="1.5"/></svg>';
+
+  if(kind === 'triangle'){
+    return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 30 30"><polygon points="15,3 28,27 2,27" fill="'+color+'" stroke="#000" stroke-width="1.5"/></svg>';
+  }
+  if(kind === 'diamond'){
+    return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 30 30"><polygon points="15,2 28,15 15,28 2,15" fill="'+color+'" stroke="#000" stroke-width="1.5"/></svg>';
+  }
+  if(kind === 'square'){
+    return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 30 30"><rect x="3" y="3" width="24" height="24" fill="'+color+'" stroke="#000" stroke-width="1.5"/></svg>';
+  }
+  if(kind === 'circle'){
+    return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 30 30"><circle cx="15" cy="15" r="10" fill="'+color+'" stroke="#000" stroke-width="1.5"/></svg>';
+  }
+  if(kind === 'label'){
+    const rectW = 26, rectH = 15;
+    const x = (s - rectW)/2, y = (s - rectH)/2;
+    const fs = 12;
+    return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 '+s+' '+s+'">'
+      + '<rect x="'+x+'" y="'+y+'" width="'+rectW+'" height="'+rectH+'" fill="'+(def.bg||color)+'" stroke="#000" stroke-width="1.5"/>'
+      + '<text x="15" y="'+(15 + fs*0.35)+'" text-anchor="middle" font-size="'+fs+'" font-weight="bold" fill="'+(def.fg||'#000')+'">'+(def.text||'?')+'</text>'
+      + '</svg>';
+  }
+  if(kind === 'floor'){
+    const label = def.shortLabel || def.label;
+    const fs = label.length > 2 ? 10 : (label.length > 1 ? 12 : 14);
+    return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 '+s+' '+s+'">'
+      + '<text x="15" y="'+(15 + fs*0.35)+'" text-anchor="middle" font-size="'+fs+'" font-weight="800" fill="#8A6A00">'+label+'</text>'
+      + '</svg>';
+  }
   return '';
 }
+
 (function buildSymbolBar(){
   const bar = document.getElementById('symbol-bar');
+  let sepAdded = false;
   Object.keys(SYMBOLS).forEach(key => {
     const def = SYMBOLS[key];
+    // Voeg een dunne lijn toe vóór de eerste verdieping
+    if(def.kind === 'floor' && !sepAdded){
+      const sep = document.createElement('div');
+      sep.className = 'sym-sep';
+      bar.appendChild(sep);
+      sepAdded = true;
+    }
     const b = document.createElement('button');
-    b.className = 'sym-btn';
+    b.className = 'sym-btn' + (def.kind === 'floor' ? ' floor-btn' : '');
     b.dataset.sym = key;
-    b.innerHTML = symbolSVG(def.kind, def.color) + '<span class="lbl">'+def.label+'</span>';
+    const btnLabel = def.shortLabel || def.label;
+    b.innerHTML = symbolSVG(def) + '<span class="lbl">'+btnLabel+'</span>';
     b.addEventListener('click', () => {
       pendingSymbol = key;
       document.querySelectorAll('.sym-btn').forEach(s => s.classList.remove('active'));
@@ -621,18 +681,56 @@ function symbolSVG(kind, color){
   });
 })();
 
-function makeSymbolShape(kind, color){
+function makeSymbolShape(kind, color, def){
+  def = def || {};
   if(kind === 'triangle') return new Konva.RegularPolygon({ sides:3, radius:22, fill:color, stroke:'#000', strokeWidth:1.5, perfectDrawEnabled:false });
   if(kind === 'diamond')  return new Konva.RegularPolygon({ sides:4, radius:22, fill:color, stroke:'#000', strokeWidth:1.5, perfectDrawEnabled:false });
   if(kind === 'square')   return new Konva.Rect({ x:-20, y:-20, width:40, height:40, fill:color, stroke:'#000', strokeWidth:1.5, perfectDrawEnabled:false });
-  if(kind === 'circle')   return new Konva.Circle({ radius:13, fill:color, stroke:'#000', strokeWidth:1.5, perfectDrawEnabled:false });
-  return new Konva.Circle({ radius:13, fill:color });
+  if(kind === 'circle')   return new Konva.Circle({ radius:10, fill:color, stroke:'#000', strokeWidth:1.5, perfectDrawEnabled:false });
+  if(kind === 'label'){
+    const w = def.w || 48, h = def.h || 30, fs = def.fs || 15;
+    const g = new Konva.Group();
+    g.add(new Konva.Rect({ x:-w/2, y:-h/2, width:w, height:h, fill:def.bg||color, stroke:'#000', strokeWidth:1.5, perfectDrawEnabled:false }));
+    g.add(new Konva.Text({ x:-w/2, y:-h/2, width:w, height:h, text:def.text||'?', fontSize:fs, fontStyle:'bold', fill:def.fg||'#000', align:'center', verticalAlign:'middle', listening:false, perfectDrawEnabled:false }));
+    return g;
+  }
+  return new Konva.Circle({ radius:10, fill:color });
 }
+
 function placeSymbol(key, x, y){
   const def = SYMBOLS[key];
   if(!def) return;
+
+  // Verdieping → plaats als gele tekst (zelfde grootte als Tekst-tool)
+  if(def.kind === 'floor'){
+    const label = def.shortLabel || def.label;
+    const t = new Konva.Text({
+      x: x - 30, y: y - 18,
+      width: 60, height: 36,
+      text: label,
+      fontSize: 22, fill: '#FFC000', fontStyle: 'bold',
+      align: 'center', verticalAlign: 'middle',
+      draggable: false, perfectDrawEnabled: false,
+      listening: true,
+    });
+    t.on('dblclick dbltap', () => {
+      const val = prompt('Wijzig verdieping', t.text());
+      if(val !== null){ t.text(val); commitHistory(); saveScene(); }
+      drawLayer.batchDraw();
+    });
+    drawLayer.add(t);
+    enableSelect(t);
+    selectNode(t);
+    drawLayer.batchDraw();
+    commitHistory(); saveScene(); isDirty = false;
+    setTool('select');
+    document.querySelectorAll('.sym-btn').forEach(b => b.classList.remove('active'));
+    return;
+  }
+
+  // Normale symbolen
   const g = new Konva.Group({ x:x, y:y, draggable:false });
-  g.add(makeSymbolShape(def.kind, def.color));
+  g.add(makeSymbolShape(def.kind, def.color, def));
   drawLayer.add(g);
   enableSelect(g);
   selectNode(g);
@@ -822,7 +920,6 @@ document.getElementById('bb-delete').addEventListener('click', () => {
   document.getElementById('btn-remove-photo').click();
 });
 
-/* ============ Prullenbak boven: verwijder geselecteerde vorm ============ */
 btnDelTop.addEventListener('click', () => {
   if(!selectedNode) return;
   selectedNode.destroy();
@@ -1113,7 +1210,7 @@ document.getElementById('btn-export-all').addEventListener('click', async () => 
     flushAndSave();
     const imgs = imageFiles.map(it => ({ id:it.id, name:it.name, dataURL:it.dataURL, w:it.w, h:it.h }));
     const sc = {}; imgs.forEach(it => { sc[it.id] = scenes[it.id] || EMPTY_JSON; });
-    const data = { version:4, projectName:(document.getElementById('projectName').value||'').trim(), images:imgs, scenes:sc };
+    const data = { version:5, projectName:(document.getElementById('projectName').value||'').trim(), images:imgs, scenes:sc };
     jsonBlob = new Blob([JSON.stringify(data)], { type:'application/json' });
     jsonName = 'project.json';
   }
@@ -1158,7 +1255,7 @@ document.getElementById('btn-export-project').addEventListener('click', () => {
     flushAndSave();
     const imgs = imageFiles.map(it => ({ id:it.id, name:it.name, dataURL:it.dataURL, w:it.w, h:it.h }));
     const sc = {}; imgs.forEach(it => { sc[it.id] = scenes[it.id] || EMPTY_JSON; });
-    const data = { version:4, projectName:(document.getElementById('projectName').value||'').trim(), images:imgs, scenes:sc };
+    const data = { version:5, projectName:(document.getElementById('projectName').value||'').trim(), images:imgs, scenes:sc };
     const base = (document.getElementById('projectName').value || 'project')
       .replace(/[\\/:*?"<>|]+/g,'_').replace(/\s+/g,' ').trim() || 'project';
     downloadBlob(base + '.json', new Blob([JSON.stringify(data, null, 2)], { type:'application/json' }));
@@ -1245,7 +1342,7 @@ document.addEventListener('touchend', e => {
 }, { passive:false });
 
 updateBottomBar();
-console.log('Tekenapp Fiber v12');
+console.log('Tekenapp Fiber v13');
 })();
 </script>
 </body>
