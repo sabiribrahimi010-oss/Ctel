@@ -40,6 +40,13 @@ button{touch-action:manipulation;user-select:none;-webkit-user-select:none;font-
 .ltype-btn .swatch.dashed.orange{background-image:repeating-linear-gradient(90deg,#FFC000 0 6px,transparent 6px 11px)}
 .ltype-btn .lbl{font-size:8px;color:#555;line-height:1;letter-spacing:.2px}
 
+/* Gele tekst-knop naast de lijntypes */
+.yt-btn{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:64px;height:40px;padding:0 10px;border:2px solid #FFE082;background:#FFFDE7;border-radius:8px;cursor:pointer;flex-shrink:0}
+.yt-btn:active{background:#FFF3C4}
+.yt-btn.active{border-color:#B58500;background:#FFF3C4}
+.yt-btn .yt-txt{font-size:11px;font-weight:800;color:#8A6A00;line-height:1}
+.yt-btn .yt-lbl{font-size:8px;color:#666;line-height:1;letter-spacing:.2px}
+
 #main{flex:1;min-height:0;display:grid;grid-template-columns:82px 1fr;overflow:hidden}
 #symbol-bar{background:#fff;border-right:1px solid var(--line);overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:4px 3px;display:flex;flex-direction:column;gap:4px}
 #symbol-bar::-webkit-scrollbar{width:0}
@@ -68,11 +75,13 @@ button{touch-action:manipulation;user-select:none;-webkit-user-select:none;font-
   .btn{padding:0 14px}
   .ltype-btn{min-width:74px}
   .ltype-btn .swatch{width:60px}
+  .yt-btn{min-width:74px}
 }
 @media (orientation: landscape) and (min-width: 1200px){
   #main{grid-template-columns:220px 1fr}
   .ltype-btn{min-width:86px}
   .ltype-btn .swatch{width:72px}
+  .yt-btn{min-width:86px}
 }
 
 .bottom-bar{flex:0 0 auto;display:flex;gap:6px;align-items:center;padding:6px 10px;padding-bottom:calc(6px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid var(--line);z-index:100}
@@ -271,6 +280,12 @@ const LINE_TYPES = {
   ind_zicht: { label:'IND ZIEN',  color:'#FFC000', width:3, dash:null,                          pointerLen:7  },
   ind_niet:  { label:'IND NIET',  color:'#FFC000', width:3, dash:[10,7],  dashedClass:'orange', pointerLen:7  },
 };
+
+/* Gele-tekst knoppen naast de lijntypes */
+const YT_BUTTONS = [
+  { key:'wachtbuis', text:'Wachtbuis aanwezig', shortTxt:'WACHTBUIS', subLbl:'aanwezig' },
+  { key:'gleuf',     text:'gleuf',              shortTxt:'GLEUF',     subLbl:'' },
+];
 
 const SYMBOLS = {
   intrede_onder: { label:'Ondergronds', kind:'triangle', color:'#1E88E5' },
@@ -576,6 +591,7 @@ function setTool(t){
     pendingSymbol = null;
     document.getElementById('modeIndicator').classList.add('hidden');
     document.querySelectorAll('.sym-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.yt-btn').forEach(b => b.classList.remove('active'));
   }
   refreshDraggables();
   updateWrapperMode();
@@ -586,8 +602,10 @@ Object.keys(toolBtnMap).forEach(t => {
 });
 setTool('select');
 
+/* Lijntypes + gele-tekst knoppen in dezelfde rij */
 (function buildLineTypes(){
   const row = document.getElementById('linetype-row');
+
   Object.keys(LINE_TYPES).forEach(key => {
     const def = LINE_TYPES[key];
     const b = document.createElement('button');
@@ -601,15 +619,48 @@ setTool('select');
       currentLineType = key;
       document.querySelectorAll('.ltype-btn').forEach(x => x.classList.remove('active'));
       b.classList.add('active');
-      // Gele stippellijn (IND NIET) automatisch op Pijl, rest op Lijn
       if(key === 'ind_niet') setTool('arrow');
       else setTool('line');
     });
     row.appendChild(b);
   });
+
+  // Visuele scheiding
+  const sep = document.createElement('div');
+  sep.className = 'tbar-sep';
+  row.appendChild(sep);
+
+  // Gele-tekst knoppen
+  YT_BUTTONS.forEach(yt => {
+    const b = document.createElement('button');
+    b.className = 'yt-btn';
+    b.dataset.yt = yt.key;
+    b.innerHTML = '<span class="yt-txt">'+yt.shortTxt+'</span><span class="yt-lbl">'+(yt.subLbl||'')+'</span>';
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.yt-btn').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      startYellowText(yt.text);
+    });
+    row.appendChild(b);
+  });
 })();
 
-/* ====== SVG icons voor de linker balk ====== */
+/* Start plaatsing van gele tekst */
+function startYellowText(text){
+  pendingSymbol = { kind:'textsym', text: text, fs: 22, color:'#FFC000' };
+  currentTool = 'symbol';
+  Object.values(toolBtnMap).forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.classList.remove('active');
+  });
+  document.querySelectorAll('.sym-btn').forEach(s => s.classList.remove('active'));
+  document.getElementById('modeIndicator').classList.remove('hidden');
+  document.getElementById('modeIndicator').textContent = text;
+  refreshDraggables();
+  updateWrapperMode();
+}
+
+/* SVG icons voor de linker balk */
 function symbolSVG(def){
   const kind = def.kind;
   const color = def.color;
@@ -651,7 +702,6 @@ function symbolSVG(def){
   let sepAdded = false;
   Object.keys(SYMBOLS).forEach(key => {
     const def = SYMBOLS[key];
-    // Voeg een dunne lijn toe vóór de eerste verdieping
     if(def.kind === 'floor' && !sepAdded){
       const sep = document.createElement('div');
       sep.className = 'sym-sep';
@@ -666,6 +716,7 @@ function symbolSVG(def){
     b.addEventListener('click', () => {
       pendingSymbol = key;
       document.querySelectorAll('.sym-btn').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.yt-btn').forEach(s => s.classList.remove('active'));
       b.classList.add('active');
       currentTool = 'symbol';
       Object.values(toolBtnMap).forEach(id => {
@@ -697,11 +748,39 @@ function makeSymbolShape(kind, color, def){
   return new Konva.Circle({ radius:10, fill:color });
 }
 
-function placeSymbol(key, x, y){
-  const def = SYMBOLS[key];
+function placeSymbol(keyOrDef, x, y){
+  const def = (typeof keyOrDef === 'string') ? SYMBOLS[keyOrDef] : keyOrDef;
   if(!def) return;
 
-  // Verdieping → plaats als gele tekst (zelfde grootte als Tekst-tool)
+  // Gele tekst (Wachtbuis aanwezig / gleuf)
+  if(def.kind === 'textsym'){
+    const t = new Konva.Text({
+      x: x, y: y - 14,
+      text: def.text || '?',
+      fontSize: def.fs || 22,
+      fill: def.color || '#FFC000',
+      fontStyle: 'bold',
+      draggable: false,
+      padding: 4,
+      perfectDrawEnabled: false,
+    });
+    t.on('dblclick dbltap', () => {
+      const val = prompt('Wijzig tekst', t.text());
+      if(val !== null){ t.text(val); commitHistory(); saveScene(); }
+      drawLayer.batchDraw();
+    });
+    drawLayer.add(t);
+    enableSelect(t);
+    selectNode(t);
+    drawLayer.batchDraw();
+    commitHistory(); saveScene(); isDirty = false;
+    setTool('select');
+    document.querySelectorAll('.sym-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.yt-btn').forEach(b => b.classList.remove('active'));
+    return;
+  }
+
+  // Verdieping → gele tekst, zelfde grootte als Tekst-tool
   if(def.kind === 'floor'){
     const label = def.shortLabel || def.label;
     const t = new Konva.Text({
@@ -1342,7 +1421,7 @@ document.addEventListener('touchend', e => {
 }, { passive:false });
 
 updateBottomBar();
-console.log('Tekenapp Fiber v13');
+console.log('Tekenapp Fiber v14');
 })();
 </script>
 </body>
